@@ -14,20 +14,52 @@ import TopCloudAlbums from "./components/TopCloudAlbums";
 import TopArtists from "./components/TopArtists";
 import AnalyticsCharts from "./components/AnalyticsCharts";
 import NewReleases from "./components/NewReleases";
+import ArtistProfileView from "./components/ArtistProfileView";
 import { artists } from "./data/artists";
 import { songs } from "./data/songs";
 import { albums } from "./data/albums";
-import { AlertCircle, Trophy } from "lucide-react";
+import { AlertCircle, Trophy, Globe, Heart, Play, Pause, ChevronRight, Eye, Star, Info, User } from "lucide-react";
 
 export default function App() {
   const dashboardRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState("favorites");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedArtistId, setSelectedArtistId] = useState<number>(1); // Default to Sabrina Carpenter (ID 1)
+ // Navigation & View states
+ const [viewMode, setViewMode] = useState<"dashboard" | "artist" | "songs" | "albums">("dashboard");
+ const [selectedArtistId, setSelectedArtistId] = useState<number>(1); // Default to Sabrina Carpenter
+ const [searchQuery, setSearchQuery] = useState("");
+ const [language, setLanguage] = useState<"es" | "en">("es"); // Default to Spanish as requested/shown
+
+ // User-specific states (favorites & recently viewed lists)
+ const [favorites, setFavorites] = useState<number[]>([1, 2, 4, 8]); // Default initial favorites
+ const [recentlyViewed, setRecentlyViewed] = useState<number[]>([3, 5, 6]);
+
+ // Audio player mock indicator for the active artist
+ const [isPlaying, setIsPlaying] = useState(false);
 
   // Scroll to dashboard smoothly
   const handleScrollToDashboard = () => {
     dashboardRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+   // Helper to change artist and automatically track recently viewed & switch view to artist detail
+   const handleSelectArtist = (id: number) => {
+    setSelectedArtistId(id);
+    setRecentlyViewed((prev) => {
+      const filtered = prev.filter((x) => x !== id);
+      return [id, ...filtered].slice(0, 5);
+    });
+    setViewMode("artist");
+    setSearchQuery(""); // Clear search bar
+  };
+
+  // Add/remove favorite toggle
+  const handleToggleFavorite = (id: number) => {
+    setFavorites((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((x) => x !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
   };
 
   // Live Search Filtering for Artists, Songs, and Albums
@@ -52,6 +84,86 @@ export default function App() {
     return artists.find(a => a.id === selectedArtistId) || artists[0];
   }, [selectedArtistId]);
 
+// Get current artist's albums
+const currentArtistAlbums = useMemo(() => {
+  return albums.filter((al) => al.artistId === selectedArtistId);
+}, [selectedArtistId]);
+
+// Get current artist's songs
+const currentArtistSongs = useMemo(() => {
+  return songs.filter((s) => s.artistId === selectedArtistId);
+}, [selectedArtistId]);
+
+// Translation mapping for dashboard elements
+const t = {
+  en: {
+    breadcrumbHome: "Home",
+    breadcrumbArtist: "Artist",
+    breadcrumbDashboard: "Dashboard",
+    rankedLive: "Ranked Live",
+    keyMetrics: "Key Metrics",
+    conversionRate: "Conversion Rate",
+    subscriptionEarning: "Subscription Earning",
+    netBenefits: "Net Benefits",
+    topSongsTitle: "Top songs of the moment",
+    top5Title: "Top 5 Artists of the Moment",
+    newReleases: "New Releases",
+    edition: "2026 Edition",
+    searchHint: "Search artist, song, or album...",
+    tracksTabHeader: "Detailed Track Analytics",
+    albumsTabHeader: "Album ROI & Break-Even Performance",
+    playPreview: "PLAY PREVIEW",
+    pausePreview: "PAUSE PREVIEW",
+    totalViews: "Total Views",
+    earnings: "Earnings",
+    roi: "ROI",
+    cost: "Production Cost",
+  },
+  es: {
+    breadcrumbHome: "Inicio",
+    breadcrumbArtist: "Artista",
+    breadcrumbDashboard: "Consola",
+    rankedLive: "Clasificado en Vivo",
+    keyMetrics: "Métricas Clave",
+    conversionRate: "Conversión de Oyentes",
+    subscriptionEarning: "Ingresos por Suscripción",
+    netBenefits: "Beneficio Neto",
+    topSongsTitle: "Canciones populares del momento",
+    top5Title: "Los 5 mejores artistas del momento",
+    newReleases: "Nuevos Lanzamientos",
+    edition: "Edición 2026",
+    searchHint: "Buscar artista, canción o álbum...",
+    tracksTabHeader: "Análisis Detallado de Canciones",
+    albumsTabHeader: "Rendimiento ROI y Punto de Equilibrio de Álbumes",
+    playPreview: "REPRODUCIR PREVIA",
+    pausePreview: "PAUSAR PREVIA",
+    totalViews: "Vistas Totales",
+    earnings: "Ganancias",
+    roi: "Retorno (ROI)",
+    cost: "Costo de Producción",
+  },
+}[language];
+
+// Sync menu active tab selection with our viewModes
+const handleMenuTabChange = (tab: string) => {
+  if (tab === "artist") {
+    setViewMode("artist");
+  } else if (tab === "songs") {
+    setViewMode("songs");
+  } else if (tab === "albums") {
+    setViewMode("albums");
+  } else {
+    setViewMode("dashboard");
+  }
+};
+
+// Convert viewMode string back to LeftMenu tab identifier
+const activeMenuTab = useMemo(() => {
+  if (viewMode === "artist") return "artist";
+  if (viewMode === "songs") return "songs";
+  if (viewMode === "albums") return "albums";
+  return "";
+}, [viewMode]);
 
   return (
     <div className="relative w-full min-h-screen bg-black overflow-x-hidden text-white font-sans selection:bg-pink-500 selection:text-white">
@@ -68,23 +180,58 @@ export default function App() {
         <div className="absolute top-20 left-1/3 w-[30vw] h-[30vw] rounded-full bg-pink-500/5 blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-20 right-1/4 w-[30vw] h-[30vw] rounded-full bg-orange-500/5 blur-[120px] pointer-events-none"></div>
 
-        {/* 3-Column Layout: Left Menu (Pill), Center Area (Dashboard Content), Right Sidebar (New Releases) */}
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+        {/* Outer container restricting content width and aligning 3 major areas */}
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-20">
           
+          {/* AREA 1: STATIC LEFT COLUMN (Menu remains static/sticky) */}
+          <div className="lg:col-span-2 flex justify-start items-start">
+            <div className="sticky top-12 w-full">
+              <LeftMenu
+                activeTab={activeMenuTab}
+                setActiveTab={handleMenuTabChange}
+                favorites={favorites}
+                toggleFavorite={handleToggleFavorite}
+                recentlyViewed={recentlyViewed}
+                onSelectArtist={handleSelectArtist}
+                selectedArtistId={selectedArtistId}
+                language={language}
+                setLanguage={setLanguage}
+              />
+              
+              {/* Back to Home/Dashboard button */}
+              {viewMode !== "dashboard" && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onClick={() => setViewMode("dashboard")}
+                  className="w-full mt-4 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-full border border-white/10 bg-white/2 text-xs font-bold uppercase tracking-wider text-neutral-300 hover:text-white hover:bg-white/6 transition"
+                >
+                  &larr; {language === "es" ? "Panel General" : "Main Dashboard"}
+                </motion.button>
+              )}
+            </div>
+          </div>
 
-          {/* COLUMN 2: CENTER AREA (8 Col span on large screen) */}
-          <div className="lg:col-span-8 flex flex-col gap-6">
+          {/* AREA 2: CENTRAL CONTAINER (Scrollable area, holding search and active content views) */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
             
-            {/* Top Breadcrumb & User Avatar Bar */}
+            {/* Sticky Breadcrumb + Header bar */}
             <div className="w-full flex items-center justify-between px-2 text-neutral-400 text-xs font-mono select-none">
               <div className="flex items-center gap-1.5 uppercase tracking-widest">
-                <span>home</span>
+                <button onClick={() => setViewMode("dashboard")} className="hover:text-white transition">
+                  {t.breadcrumbHome}
+                </button>
                 <span>&gt;</span>
-                <span className="text-white">2026</span>
+                <span className="text-white">
+                  {viewMode === "dashboard" ? t.breadcrumbDashboard : t.breadcrumbArtist}
+                </span>
+                <span>&gt;</span>
+                <span className="text-pink-500 font-bold">{currentArtist.name}</span>
               </div>
-              
+
+              {/* Developer badge info */}
               <div className="flex items-center gap-2">
-                <span className="text-[10px] tracking-wide text-neutral-500 font-bold uppercase">My profile</span>
+                <span className="text-[9px] tracking-wider text-neutral-500 font-bold uppercase">My profile</span>
                 <div className="w-8 h-8 rounded-full border border-pink-500/40 p-0.5 overflow-hidden">
                   <img
                     src="https://picsum.photos/seed/user-avatar/100"
@@ -96,8 +243,10 @@ export default function App() {
               </div>
             </div>
 
-            {/* Search Bar */}
-            <SearchBar searchQuery={searchQuery} onSearch={setSearchQuery} />
+            {/* Static Sticky Search Bar at top of scrolling central panel */}
+            <div className="sticky top-0 z-40 bg-[#060606]/80 backdrop-blur-md pt-2 pb-4 -mx-2 px-2 rounded-2xl">
+              <SearchBar searchQuery={searchQuery} onSearch={setSearchQuery} />
+            </div>
 
             {/* Live Search Overlay Results */}
             <AnimatePresence>
@@ -106,34 +255,31 @@ export default function App() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="w-full max-w-2xl mx-auto rounded-2xl border border-white/10 glass-panel-heavy p-4 shadow-2xl space-y-3 relative z-30"
+                  className="w-full rounded-2xl border border-white/10 glass-panel-heavy p-5 shadow-2xl space-y-4 relative z-50"
                   id="search-results-panel"
                 >
-                  <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-neutral-400">
+                  <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-neutral-400 border-b border-white/5 pb-2">
                     <span>Search results</span>
-                    <span>Type to filter</span>
+                    <span>Click to view profile</span>
                   </div>
 
                   {!searchResults.hasResults ? (
                     <div className="flex items-center gap-2 text-neutral-500 text-xs py-4 justify-center">
-                      <AlertCircle className="w-4 h-4" />
+                      <AlertCircle className="w-4 h-4 text-pink-500" />
                       <span>No matching songs, albums, or artists found.</span>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {/* Artists Results */}
                       {searchResults.artists.length > 0 && (
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                           <span className="text-[9px] font-bold text-pink-500 uppercase tracking-widest font-mono">Artists</span>
                           <div className="space-y-1">
-                            {searchResults.artists.map(a => (
+                            {searchResults.artists.map((a) => (
                               <button
                                 key={a.id}
-                                onClick={() => {
-                                  setSelectedArtistId(a.id);
-                                  setSearchQuery("");
-                                }}
-                                className="w-full flex items-center gap-2 p-1.5 rounded bg-white/2 hover:bg-white/8 text-xs text-left text-neutral-200 transition"
+                                onClick={() => handleSelectArtist(a.id)}
+                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/2 hover:bg-pink-500/10 border border-transparent hover:border-pink-500/20 text-xs text-left text-neutral-200 transition"
                               >
                                 <img src={a.avatarUrl} className="w-5 h-5 rounded-full object-cover" />
                                 <span className="truncate">{a.name}</span>
@@ -145,17 +291,14 @@ export default function App() {
 
                       {/* Songs Results */}
                       {searchResults.songs.length > 0 && (
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                           <span className="text-[9px] font-bold text-orange-500 uppercase tracking-widest font-mono">Songs</span>
                           <div className="space-y-1">
-                            {searchResults.songs.map(s => (
+                            {searchResults.songs.map((s) => (
                               <button
                                 key={s.id}
-                                onClick={() => {
-                                  setSelectedArtistId(s.artistId);
-                                  setSearchQuery("");
-                                }}
-                                className="w-full flex items-center gap-2 p-1.5 rounded bg-white/2 hover:bg-white/8 text-xs text-left text-neutral-200 transition"
+                                onClick={() => handleSelectArtist(s.artistId)}
+                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/2 hover:bg-orange-500/10 border border-transparent hover:border-orange-500/20 text-xs text-left text-neutral-200 transition"
                               >
                                 <img src={s.coverUrl} className="w-5 h-5 rounded object-cover" />
                                 <span className="truncate">{s.titleSong}</span>
@@ -167,17 +310,14 @@ export default function App() {
 
                       {/* Albums Results */}
                       {searchResults.albums.length > 0 && (
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                           <span className="text-[9px] font-bold text-purple-500 uppercase tracking-widest font-mono">Albums</span>
                           <div className="space-y-1">
-                            {searchResults.albums.map(al => (
+                            {searchResults.albums.map((al) => (
                               <button
                                 key={al.id}
-                                onClick={() => {
-                                  setSelectedArtistId(al.artistId);
-                                  setSearchQuery("");
-                                }}
-                                className="w-full flex items-center gap-2 p-1.5 rounded bg-white/2 hover:bg-white/8 text-xs text-left text-neutral-200 transition"
+                                onClick={() => handleSelectArtist(al.artistId)}
+                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/2 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 text-xs text-left text-neutral-200 transition"
                               >
                                 <img src={al.coverUrl} className="w-5 h-5 rounded object-cover" />
                                 <span className="truncate">{al.titleAlbum}</span>
@@ -192,28 +332,215 @@ export default function App() {
               )}
             </AnimatePresence>
 
-            {/* "cl" + Albums + "d" = CLOUD Top Ranked Element */}
-            <TopCloudAlbums selectedId={selectedArtistId} onSelect={setSelectedArtistId} />
+            {/* DYNAMIC CONTENT SWITCHER */}
+            <AnimatePresence mode="wait">
+              {/* VIEW 1: HOME/DASHBOARD VIEW */}
+              {viewMode === "dashboard" && (
+                <motion.div
+                  key="dashboard-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-6"
+                >
+                  {/* Top Cloud Album Logo ("cl" + Circles + "d" = CLOUD) */}
+                  <TopCloudAlbums selectedId={selectedArtistId} onSelect={handleSelectArtist} />
 
-            {/* Glass Box containing Top 5 Artists + Key KPIs */}
-            <div className="rounded-3xl border border-white/5 bg-white/1 backdrop-blur-lg p-6 shadow-2xl space-y-6">
-              
-              {/* Top 5 Row */}
-              <TopArtists selectedArtistId={selectedArtistId} onSelectArtist={setSelectedArtistId} />
-              
-              {/* Divider */}
-              <div className="h-px bg-white/5 w-full"></div>
+                  {/* Carousel list of Top 5 Artists of the Moment */}
+                  <div className="rounded-3xl border border-white/5 bg-white/1 backdrop-blur-lg p-6 shadow-2xl space-y-6">
+                    <TopArtists selectedArtistId={selectedArtistId} onSelectArtist={handleSelectArtist} />
 
-          
-            </div>
+                    {/* Divider */}
+                    <div className="h-px bg-white/5 w-full"></div>
 
-            {/* Two Analytics Graphs */}
-            <AnalyticsCharts selectedArtistId={selectedArtistId} />
+                    {/* Detailed stats with add to favorites options */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[10px] font-mono tracking-widest uppercase text-neutral-400 flex items-center gap-1.5">
+                          <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+                          {currentArtist.name}
+                        </span>
+                        
+                        <button
+                          onClick={() => handleToggleFavorite(selectedArtistId)}
+                          className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-neutral-300 hover:text-pink-500 hover:bg-pink-500/5 transition duration-300"
+                        >
+                          <Heart className={`w-3 h-3 ${favorites.includes(selectedArtistId) ? "fill-pink-500 text-pink-500" : ""}`} />
+                          <span>{favorites.includes(selectedArtistId) ? "FAVORITED" : "ADD TO FAVS"}</span>
+                        </button>
+                      </div>
+
+                      
+                    </div>
+                  </div>
+
+                  {/* General analytics trends */}
+                  <AnalyticsCharts selectedArtistId={selectedArtistId} />
+                </motion.div>
+              )}
+
+              {/* VIEW 2: DETAILED ARTIST PROFILE VIEW (The second screen in mockups) */}
+              {viewMode === "artist" && (
+                <motion.div
+                  key="artist-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <ArtistProfileView artist={currentArtist} />
+                </motion.div>
+              )}
+
+              {/* VIEW 3: DETAILED SONGS TAB */}
+              {viewMode === "songs" && (
+                <motion.div
+                  key="songs-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  className="space-y-6"
+                >
+                  <div className="rounded-3xl border border-white/10 glass-panel p-6 shadow-2xl">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
+                          <User className="w-4 h-4 text-pink-500" />
+                        </div>
+                        <h2 className="text-lg font-bold text-white tracking-wide uppercase font-mono">
+                          {t.tracksTabHeader}
+                        </h2>
+                      </div>
+                      <span className="text-xs text-neutral-400 font-mono">{currentArtist.name}</span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {currentArtistSongs.map((song) => (
+                        <div
+                          key={song.id}
+                          className="flex flex-wrap items-center justify-between p-3 rounded-2xl border border-white/5 bg-white/1 hover:bg-white/4 transition duration-300"
+                        >
+                          <div className="flex items-center gap-3">
+                            <img src={song.coverUrl} className="w-10 h-10 rounded-xl object-cover border border-white/10" />
+                            <div>
+                              <h4 className="text-sm font-bold text-white">{song.titleSong}</h4>
+                              <p className="text-[10px] text-neutral-500 font-mono">ID: {song.id} &bull; {song.year}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-8 font-mono text-xs">
+                            <div className="text-right">
+                              <span className="text-[9px] text-neutral-500 block uppercase">{t.totalViews}</span>
+                              <span className="font-bold text-neutral-200">{(song.totalViews / 1000000).toFixed(1)}M</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[9px] text-neutral-500 block uppercase">{t.earnings}</span>
+                              <span className="font-bold text-emerald-400">${(song.kpis.earnings / 1000000).toFixed(1)}M</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* VIEW 4: DETAILED ALBUMS TAB */}
+              {viewMode === "albums" && (
+                <motion.div
+                  key="albums-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  className="space-y-6"
+                >
+                  <div className="rounded-3xl border border-white/10 glass-panel p-6 shadow-2xl">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                          <Trophy className="w-4 h-4 text-purple-500" />
+                        </div>
+                        <h2 className="text-lg font-bold text-white tracking-wide uppercase font-mono">
+                          {t.albumsTabHeader}
+                        </h2>
+                      </div>
+                      <span className="text-xs text-neutral-400 font-mono">{currentArtist.name}</span>
+                    </div>
+
+                    <div className="space-y-4">
+                      {currentArtistAlbums.map((album) => (
+                        <div
+                          key={album.id}
+                          className="p-4 rounded-2xl border border-white/5 bg-white/1 space-y-4 hover:bg-white/3 transition duration-300"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <img src={album.coverUrl} className="w-12 h-12 rounded-xl object-cover border border-white/10" />
+                              <div>
+                                <h4 className="text-sm font-bold text-white">{album.titleAlbum}</h4>
+                                <p className="text-[10px] text-neutral-400 italic max-w-xs">{album.description}</p>
+                              </div>
+                            </div>
+                            <div className="text-right font-mono">
+                              <span className="text-[9px] text-neutral-500 block uppercase">{t.roi}</span>
+                              <span className="text-sm font-black text-pink-500">{album.roi}%</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/5 font-mono text-center">
+                            <div>
+                              <span className="text-[9px] text-neutral-500 block uppercase">{t.earnings}</span>
+                              <span className="text-xs font-bold text-neutral-200">${(album.revenue / 1000000).toFixed(1)}M</span>
+                            </div>
+                            <div>
+                              <span className="text-[9px] text-neutral-500 block uppercase">{t.cost}</span>
+                              <span className="text-xs font-bold text-neutral-400">${(album.productionCost / 1000000).toFixed(1)}M</span>
+                            </div>
+                            <div>
+                              <span className="text-[9px] text-neutral-500 block uppercase">Break Even</span>
+                              <span className="text-xs font-bold text-neutral-400">{album.breakEven.toLocaleString()} units</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* COLUMN 3: RIGHT SIDEBAR (3 Col span on large screen) */}
+          {/* AREA 3: STATIC RIGHT SIDEBAR / PORTRAIT COLUMN */}
           <div className="lg:col-span-3">
-            <NewReleases onSelectArtist={setSelectedArtistId} selectedArtistId={selectedArtistId} />
+            {/* If we are on general dashboard: render the scrollable list of new releases */}
+            {viewMode !== "artist" ? (
+              <div className="sticky top-12">
+                <NewReleases onSelectArtist={handleSelectArtist} selectedArtistId={selectedArtistId} />
+              </div>
+            ) : (
+              /* If we are on detailed artist view: render the static Big Artist Portrait (keeps fixed/static as requested) */
+              <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
+                {/* Horizontal black mask to blend photo cleanly into the middle content column */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-linear-to-r from-black via-transparent to-transparent z-20"></div>
+                {/* Vertical black mask to blend photo cleanly into the bottom floor */}
+                <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-linear-to-t from-black via-black/40 to-transparent z-20"></div>
+
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={currentArtist.id}
+                    src={currentArtist.artistPhoto}
+                    alt={currentArtist.name}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 0.88, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="w-full h-full object-cover object-center"
+                    referrerPolicy="no-referrer"
+                  />
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
         </div>
