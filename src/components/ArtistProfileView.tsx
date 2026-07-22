@@ -1,4 +1,4 @@
-import { motion} from "framer-motion";
+import { motion } from "framer-motion";
 import { useMemo } from "react";
 import {
   ResponsiveContainer,
@@ -137,7 +137,7 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
 
       {/* Row 1: Last Album Note Card + Total Earnings Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        
+
         {/* Left Card: Featured Release / Last Album Note Card */}
         <div className="lg:col-span-5 flex flex-col justify-between rounded-3xl border border-white/10 glass-panel shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] p-5 relative overflow-hidden group min-h-[300px]">
           {/* Back Glowing Aura */}
@@ -282,7 +282,7 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
 
       {/* Row 2: World Heat Map + Top Profitable Tracks */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        
+
         {/* Left: World Dot Map representing globalReach */}
         <div className="lg:col-span-6">
           <WorldHeatMap globalReach={artist.globalReach} />

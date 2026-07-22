@@ -17,17 +17,20 @@ import NewReleases from "./components/NewReleases";
 import ArtistProfileView from "./components/ArtistProfileView";
 import AlbumProfileView from "./components/AlbumProfileView";
 import AlbumSongsSidebar from "./components/AlbumSongsSidebar";
-import { artists } from "./data/artists";
-import { songs } from "./data/songs";
-import { albums } from "./data/albums";
-import { AlertCircle, Trophy, Heart, User, ChevronRight } from "lucide-react";
+import SongProfileView from "./components/SongProfileView";
+import SongsOverview from "./components/SongsOverview";
+import { artists, Artist } from "./data/artists";
+import { songs, Song } from "./data/songs";
+import { albums, Album } from "./data/albums";
+import { AlertCircle, Trophy, Globe, Heart, Play, Pause, ChevronRight, Eye, Star, Info, User } from "lucide-react";
 
 export default function App() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   // Navigation & View states
-  const [viewMode, setViewMode] = useState<"dashboard" | "artist" | "songs" | "albums" | "album_detail">("dashboard");
+  const [viewMode, setViewMode] = useState<"dashboard" | "artist" | "songs" | "albums" | "album_detail" | "song_detail">("dashboard");
   const [selectedArtistId, setSelectedArtistId] = useState<number>(1); // Default to Sabrina Carpenter
   const [selectedAlbumId, setSelectedAlbumId] = useState<number>(1);
+  const [selectedSongId, setSelectedSongId] = useState<number>(1); // Default to Song 1 (Espresso)
   const [searchQuery, setSearchQuery] = useState("");
   const [language, setLanguage] = useState<"es" | "en">("es"); // Default to Spanish as requested/shown
 
@@ -63,6 +66,13 @@ export default function App() {
     }
     setViewMode("album_detail");
     setSearchQuery(""); // Clear search bar
+  };
+
+  // Helper to switch to detailed song view (CORREGIDO: Añadida la función faltante)
+  const handleSelectSong = (id: number) => {
+    setSelectedSongId(id);
+    setViewMode("song_detail");
+    setSearchQuery("");
   };
 
   // Add/remove favorite toggle
@@ -115,6 +125,11 @@ export default function App() {
   const currentArtistSongs = useMemo(() => {
     return songs.filter((s) => s.artistId === selectedArtistId);
   }, [selectedArtistId]);
+
+  // Active selected song
+  const activeSong = useMemo(() => {
+    return songs.find((s) => s.id === selectedSongId) || songs[0];
+  }, [selectedSongId]);
 
   // Translation mapping for dashboard elements
   const t = {
@@ -433,49 +448,33 @@ export default function App() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
-                  className="space-y-6"
+                  transition={{ duration: 0.4 }}
                 >
-                  <div className="rounded-3xl border border-white/10 glass-panel p-6 shadow-2xl">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
-                          <User className="w-4 h-4 text-pink-500" />
-                        </div>
-                        <h2 className="text-lg font-bold text-white tracking-wide uppercase font-mono">
-                          {t.tracksTabHeader}
-                        </h2>
-                      </div>
-                      <span className="text-xs text-neutral-400 font-mono">{currentArtist.name}</span>
-                    </div>
+                  <SongsOverview
+                    onSelectSong={handleSelectSong}
+                    onPlaySong={() => setIsPlaying(true)}
+                    language={language}
+                    currentArtistId={selectedArtistId}
+                  />
+                </motion.div>
+              )}
 
-                    <div className="space-y-3">
-                      {currentArtistSongs.map((song) => (
-                        <div
-                          key={song.id}
-                          className="flex flex-wrap items-center justify-between p-3 rounded-2xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.04] transition duration-300"
-                        >
-                          <div className="flex items-center gap-3">
-                            <img src={song.coverUrl} className="w-10 h-10 rounded-xl object-cover border border-white/10" />
-                            <div>
-                              <h4 className="text-sm font-bold text-white">{song.titleSong}</h4>
-                              <p className="text-[10px] text-neutral-500 font-mono">ID: {song.id} &bull; {song.year}</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-8 font-mono text-xs">
-                            <div className="text-right">
-                              <span className="text-[9px] text-neutral-500 block uppercase">{t.totalViews}</span>
-                              <span className="font-bold text-neutral-200">{(song.totalViews / 1000000).toFixed(1)}M</span>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-[9px] text-neutral-500 block uppercase">{t.earnings}</span>
-                              <span className="font-bold text-emerald-400">${(song.kpis.earnings / 1000000).toFixed(1)}M</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              {/* VIEW 3.5: DETAILED SONG PROFILE VIEW */}
+              {viewMode === "song_detail" && (
+                <motion.div
+                  key="song-detail-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <SongProfileView
+                    song={activeSong}
+                    onSelectSong={handleSelectSong}
+                    onPlaySong={() => setIsPlaying(true)}
+                    onBackToCatalog={() => setViewMode("songs")}
+                    language={language}
+                  />
                 </motion.div>
               )}
 
@@ -509,8 +508,8 @@ export default function App() {
                             key={album.id}
                             onClick={() => setSelectedAlbumId(album.id)}
                             className={`p-4 rounded-2xl border transition duration-300 cursor-pointer space-y-4 ${isSelected
-                              ? "border-purple-500/60 bg-purple-500/10 shadow-lg shadow-purple-950/20"
-                              : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-purple-500/30"
+                                ? "border-purple-500/60 bg-purple-500/10 shadow-lg shadow-purple-950/20"
+                                : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-purple-500/30"
                               }`}
                           >
                             <div className="flex items-start justify-between gap-4">
@@ -592,72 +591,73 @@ export default function App() {
           </div>
 
           {/* AREA 3: STATIC RIGHT SIDEBAR / PORTRAIT COLUMN */}
-          <div className="lg:col-span-3">
-            {viewMode === "albums" ? (
-              /* Specialized side list for the Albums screen: Songs of the selected album */
-              <div className="sticky top-12">
-                <AlbumSongsSidebar
-                  album={activeAlbum}
-                  artist={currentArtist}
-                  language={language}
-                  allArtistAlbums={currentArtistAlbums}
-                  onSelectAlbum={(id: number) => setSelectedAlbumId(id)}
-                  onSelectSong={() => setIsPlaying(true)}
-                  onOpenAlbumDetail={(id: number) => handleSelectAlbum(id)}
-                />
-              </div>
-            ) : viewMode === "album_detail" ? (
-              /* If we are on detailed album view: render the static Big Album Cover on the right side of the screen */
-              <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
-                {/* Horizontal black mask to blend photo cleanly into the middle content column */}
-                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black via-transparent to-transparent z-20"></div>
-                {/* Vertical black mask to blend photo cleanly into the bottom floor */}
-                <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-gradient-to-t from-black via-black/40 to-transparent z-20"></div>
-
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={selectedAlbumId}
-                    src={(albums.find((a) => a.id === selectedAlbumId) || albums[0]).coverUrl}
-                    alt={(albums.find((a) => a.id === selectedAlbumId) || albums[0]).titleAlbum}
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 0.88, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                    className="w-full h-full object-cover object-center"
-                    referrerPolicy="no-referrer"
+          {viewMode !== "songs" && viewMode !== "song_detail" && (
+            <div className="lg:col-span-3">
+              {viewMode === "albums" ? (
+                /* Specialized side list for the Albums screen: Songs of the selected album */
+                <div className="sticky top-12">
+                  <AlbumSongsSidebar
+                    album={activeAlbum}
+                    artist={currentArtist}
+                    language={language}
+                    allArtistAlbums={currentArtistAlbums}
+                    onSelectAlbum={(id: number) => setSelectedAlbumId(id)}
+                    onSelectSong={() => setIsPlaying(true)}
+                    onOpenAlbumDetail={(id: number) => handleSelectAlbum(id)}
                   />
-                </AnimatePresence>
-              </div>
-            ) : viewMode !== "artist" ? (
-              /* If we are on general dashboard: render the scrollable list of new releases */
-              <div className="sticky top-12">
-                <NewReleases onSelectArtist={handleSelectArtist} selectedArtistId={selectedArtistId} />
-              </div>
-            ) : (
-              /* If we are on detailed artist view: render the static Big Artist Portrait (keeps fixed/static as requested) */
-              <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
-                {/* Horizontal black mask to blend photo cleanly into the middle content column */}
-                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black via-transparent to-transparent z-20"></div>
-                {/* Vertical black mask to blend photo cleanly into the bottom floor */}
-                <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-gradient-to-t from-black via-black/40 to-transparent z-20"></div>
+                </div>
+              ) : viewMode === "album_detail" ? (
+                /* If we are on detailed album view: render the static Big Album Cover on the right side of the screen */
+                <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
+                  {/* Horizontal black mask to blend photo cleanly into the middle content column */}
+                  <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black via-transparent to-transparent z-20"></div>
+                  {/* Vertical black mask to blend photo cleanly into the bottom floor */}
+                  <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-gradient-to-t from-black via-black/40 to-transparent z-20"></div>
 
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={currentArtist.id}
-                    src={currentArtist.artistPhoto}
-                    alt={currentArtist.name}
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 0.88, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                    className="w-full h-full object-cover object-center"
-                    referrerPolicy="no-referrer"
-                  />
-                </AnimatePresence>
-              </div>
-            )}
-          </div>
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={selectedAlbumId}
+                      src={(albums.find((a) => a.id === selectedAlbumId) || albums[0]).coverUrl}
+                      alt={(albums.find((a) => a.id === selectedAlbumId) || albums[0]).titleAlbum}
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 0.88, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.7, ease: "easeOut" }}
+                      className="w-full h-full object-cover object-center"
+                      referrerPolicy="no-referrer"
+                    />
+                  </AnimatePresence>
+                </div>
+              ) : viewMode !== "artist" ? (
+                /* If we are on general dashboard: render the scrollable list of new releases */
+                <div className="sticky top-12">
+                  <NewReleases onSelectArtist={handleSelectArtist} selectedArtistId={selectedArtistId} />
+                </div>
+              ) : (
+                /* If we are on detailed artist view: render the static Big Artist Portrait (keeps fixed/static as requested) */
+                <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
+                  {/* Horizontal black mask to blend photo cleanly into the middle content column */}
+                  <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black via-transparent to-transparent z-20"></div>
+                  {/* Vertical black mask to blend photo cleanly into the bottom floor */}
+                  <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-gradient-to-t from-black via-black/40 to-transparent z-20"></div>
 
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={currentArtist.id}
+                      src={currentArtist.artistPhoto}
+                      alt={currentArtist.name}
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 0.88, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.7, ease: "easeOut" }}
+                      className="w-full h-full object-cover object-center"
+                      referrerPolicy="no-referrer"
+                    />
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
