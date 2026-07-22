@@ -211,18 +211,18 @@ export default function App() {
       {/* SECTION 2: Dashboard Container */}
       <div
         ref={dashboardRef}
-        className="min-h-screen w-full relative bg-[#060606] px-4 md:px-8 py-8 flex flex-col justify-start gap-6 border-t border-white/5"
+        className="min-h-screen w-full relative bg-[#060606] px-3 sm:px-6 md:px-8 py-4 sm:py-8 flex justify-center border-t border-white/5"
       >
         {/* Glow ambient spots behind dashboard to replicate high contrast image glow */}
         <div className="absolute top-20 left-1/3 w-[30vw] h-[30vw] rounded-full bg-pink-500/5 blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-20 right-1/4 w-[30vw] h-[30vw] rounded-full bg-orange-500/5 blur-[120px] pointer-events-none"></div>
 
         {/* Outer container restricting content width and aligning 3 major areas */}
-        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-20">
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 relative z-20">
 
           {/* AREA 1: STATIC LEFT COLUMN (Menu remains static/sticky) */}
-          <div className="lg:col-span-2 flex justify-start items-start">
-            <div className="sticky top-12 w-full">
+          <div className="lg:col-span-2 flex justify-start items-start w-full">
+            <div className="relative lg:sticky lg:top-12 w-full">
               <LeftMenu
                 activeTab={activeMenuTab}
                 setActiveTab={handleMenuTabChange}
@@ -241,7 +241,7 @@ export default function App() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   onClick={() => setViewMode("dashboard")}
-                  className="w-full mt-4 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-full border border-white/10 bg-white/2 text-xs font-bold uppercase tracking-wider text-neutral-300 hover:text-white hover:bg-white/6 transition"
+                  className="w-full mt-2 lg:mt-4 flex items-center justify-center gap-1.5 py-2 px-3 sm:px-4 rounded-full border border-white/10 bg-white/[0.02] text-xs font-bold uppercase tracking-wider text-neutral-300 hover:text-white hover:bg-white/[0.06] transition"
                 >
                   &larr; {language === "es" ? "Panel General" : "Main Dashboard"}
                 </motion.button>
@@ -508,8 +508,8 @@ export default function App() {
                             key={album.id}
                             onClick={() => setSelectedAlbumId(album.id)}
                             className={`p-4 rounded-2xl border transition duration-300 cursor-pointer space-y-4 ${isSelected
-                                ? "border-purple-500/60 bg-purple-500/10 shadow-lg shadow-purple-950/20"
-                                : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-purple-500/30"
+                              ? "border-purple-500/60 bg-purple-500/10 shadow-lg shadow-purple-950/20"
+                              : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-purple-500/30"
                               }`}
                           >
                             <div className="flex items-start justify-between gap-4">

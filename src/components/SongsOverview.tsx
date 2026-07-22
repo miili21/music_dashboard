@@ -92,7 +92,7 @@ export default function SongsOverview({
         <div className="w-full space-y-6 pb-16" id="songs-overview-container">
 
             {/* 1. HEADER BANNER */}
-            <div className="rounded-3xl border border-white/10 glass-panel p-6 shadow-2xl space-y-4 relative overflow-hidden">
+            <div className="rounded-2xl sm:rounded-3xl border border-white/10 glass-panel p-4 sm:p-6 shadow-2xl space-y-4 relative overflow-hidden">
                 <div className="absolute -top-24 -right-24 w-60 h-60 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -221,7 +221,7 @@ export default function SongsOverview({
                             </div>
 
                             {/* SONGS GRID FOR THIS ALBUM */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 {sortedSongs.map((song) => (
                                     <motion.div
                                         key={song.id}

@@ -62,7 +62,6 @@ export default function SongProfileView({
                     <span>{language === "es" ? "Volver al Catálogo de Canciones" : "Back to Songs Catalog"}</span>
                 </button>
             )}
-
             {/* ----------------------------------------------------------------- */}
             {/* 1. TOP HERO CARD (FULL WIDTH BANNER CARD WITH PREDOMINANT BG COLOR) */}
             {/* ----------------------------------------------------------------- */}
@@ -71,7 +70,7 @@ export default function SongProfileView({
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="w-full rounded-3xl overflow-hidden relative shadow-2xl border border-white/10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between min-h-[220px]"
+                className="w-full rounded-2xl sm:rounded-3xl overflow-hidden relative shadow-2xl border border-white/10 p-4 sm:p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between min-h-[200px]"
                 style={{
                     backgroundColor: song.cardColor || "#8da9c4",
                 }}
@@ -81,10 +80,10 @@ export default function SongProfileView({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none z-0" />
 
                 {/* LEFT CONTENT AREA: Song Title, Metrics & Platform Pills */}
-                <div className="relative z-10 space-y-3 max-w-xl text-left w-full md:w-2/3">
+                <div className="relative z-10 space-y-2.5 max-w-xl text-left w-full md:w-2/3">
                     {/* Song selector dropdown & Artist / Album metadata */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-white/90">
-                        <span className="bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest text-[10px] font-bold">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-mono text-white/90">
+                        <span className="bg-black/40 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest text-[9px] sm:text-[10px] font-bold truncate max-w-[200px] sm:max-w-none">
                             {artist.name} &bull; {album.titleAlbum} ({song.year})
                         </span>
 
@@ -92,7 +91,7 @@ export default function SongProfileView({
                         <select
                             value={song.id}
                             onChange={(e) => onSelectSong(Number(e.target.value))}
-                            className="bg-black/50 backdrop-blur-md text-white text-[11px] font-mono px-2.5 py-1 rounded-full border border-white/20 outline-none cursor-pointer hover:bg-black/70 transition"
+                            className="bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-mono px-2 py-1 rounded-full border border-white/20 outline-none cursor-pointer hover:bg-black/70 transition max-w-[140px] sm:max-w-none truncate"
                             id="song-switcher-select"
                         >
                             {allSongs.map((s) => (
@@ -104,30 +103,30 @@ export default function SongProfileView({
                     </div>
 
                     {/* LARGE SONG TITLE (ITALIC DISPLAY) */}
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black italic tracking-tight text-white font-sans drop-shadow-md">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tight text-white font-sans drop-shadow-md leading-tight">
                         {song.titleSong}
                     </h1>
 
                     {/* METRICS OF VIEWS AND LIKES BELOW THE NAME */}
-                    <div className="flex flex-wrap items-center gap-4 text-white/90 pt-1 font-sans">
-                        <div className="text-xl sm:text-2xl font-light italic tracking-wide text-white/95">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-white/90 pt-0.5 font-sans">
+                        <div className="text-lg sm:text-2xl font-light italic tracking-wide text-white/95">
                             {song.likesFormatted} likes
                         </div>
 
                         <div className="h-4 w-[1px] bg-white/30 hidden sm:block" />
 
                         {/* Platform metrics breakdown */}
-                        <div className="flex items-center gap-3 text-xs font-mono">
-                            <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] sm:text-xs font-mono">
+                            <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-white/10">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
                                 Spotify: {(song.spotifyViews / 1000000).toFixed(0)}M
                             </span>
-                            <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10">
-                                <span className="w-2 h-2 rounded-full bg-red-400 inline-block"></span>
+                            <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-white/10">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
                                 YT: {(song.youtubeViews / 1000000).toFixed(0)}M
                             </span>
-                            <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10">
-                                <span className="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span>
+                            <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-white/10">
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block"></span>
                                 UGC: {song.ugcVideosCount}
                             </span>
                         </div>
@@ -135,8 +134,8 @@ export default function SongProfileView({
                 </div>
 
                 {/* RIGHT SIDE: ALBUM COVER ARTWORK */}
-                <div className="relative z-10 mt-6 md:mt-0 flex-shrink-0">
-                    <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/30 group">
+                <div className="relative z-10 mt-4 md:mt-0 flex-shrink-0 self-center md:self-auto">
+                    <div className="relative w-28 h-28 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/30 group">
                         <img
                             src={song.coverUrl}
                             alt={song.titleSong}
@@ -149,8 +148,8 @@ export default function SongProfileView({
                             className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center"
                             id="song-play-button-overlay"
                         >
-                            <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition">
-                                <Play className="w-6 h-6 fill-black translate-x-0.5" />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition">
+                                <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-black translate-x-0.5" />
                             </div>
                         </button>
                     </div>
@@ -161,7 +160,7 @@ export default function SongProfileView({
             {/* ----------------------------------------------------------------- */}
             {/* 2. 4 KPIS ENCLOSED IN GLASS CARDS WITH VIBRANT NEON GLOW AURA */}
             {/* ----------------------------------------------------------------- */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 py-1">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 py-1">
 
                 {/* KPI 1: Save Rate (Amber / Gold Neon Glow) */}
                 <motion.div
