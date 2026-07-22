@@ -6,16 +6,13 @@ import {
   XAxis,
   YAxis,
   Tooltip as RechartsTooltip,
-  Legend,
   BarChart,
   Bar,
-  LineChart,
-  Line,
   CartesianGrid
 } from "recharts";
 import { songs } from "../data/songs";
 import { albums } from "../data/albums";
-import { artists, Artist } from "../data/artists";
+import { artists } from "../data/artists";
 
 interface AnalyticsChartsProps {
   selectedArtistId: number;

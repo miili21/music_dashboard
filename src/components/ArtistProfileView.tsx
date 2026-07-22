@@ -10,10 +10,9 @@ import {
   CartesianGrid,
 } from "recharts";
 import { Artist } from "../data/artists";
-import { songs, Song } from "../data/songs";
-import { albums, Album } from "../data/albums";
+import { songs } from "../data/songs";
 import WorldHeatMap from "./WorldHeatMap";
-import { Music, Eye, Heart, Share2, Star, Disc } from "lucide-react";
+import { Heart } from "lucide-react";
 
 interface ArtistProfileViewProps {
   artist: Artist;

@@ -1,4 +1,3 @@
-import { motion} from "framer-motion";
 import { useMemo } from "react";
 
 interface WorldHeatMapProps {
@@ -12,32 +11,32 @@ interface CountryCoords {
   color: string;
 }
 
-export default function WorldHeatMap({ globalReach }: WorldHeatMapProps) {
-  // Mapping country names to coordinates on our SVG stage (0-100 scale)
-  const countryLocations: Record<string, { x: number; y: number; color: string }> = {
-    USA: { x: 22, y: 35, color: "from-orange-500 to-amber-400" },
-    Canada: { x: 24, y: 22, color: "from-amber-500 to-yellow-400" },
-    Mexico: { x: 20, y: 46, color: "from-red-500 to-orange-400" },
-    Colombia: { x: 28, y: 56, color: "from-yellow-500 to-orange-400" },
-    Brazil: { x: 33, y: 68, color: "from-pink-500 to-rose-400" },
-    Peru: { x: 27, y: 64, color: "from-emerald-500 to-teal-400" },
-    Chile: { x: 28, y: 80, color: "from-blue-500 to-indigo-400" },
-    Argentina: { x: 32, y: 82, color: "from-purple-500 to-pink-400" },
-    UK: { x: 46, y: 27, color: "from-cyan-500 to-blue-400" },
-    France: { x: 48, y: 33, color: "from-blue-500 to-teal-400" },
-    Germany: { x: 50, y: 29, color: "from-indigo-500 to-purple-400" },
-    Spain: { x: 46, y: 38, color: "from-orange-500 to-yellow-400" },
-    Italy: { x: 51, y: 35, color: "from-green-500 to-emerald-400" },
-    Netherlands: { x: 49, y: 28, color: "from-cyan-500 to-teal-400" },
-    "South Korea": { x: 79, y: 38, color: "from-pink-500 to-purple-400" },
-    Japan: { x: 82, y: 38, color: "from-red-500 to-pink-400" },
-    Philippines: { x: 78, y: 52, color: "from-amber-500 to-orange-400" },
-    Indonesia: { x: 76, y: 61, color: "from-teal-500 to-emerald-400" },
-    India: { x: 67, y: 46, color: "from-orange-500 to-yellow-400" },
-    Thailand: { x: 74, y: 51, color: "from-yellow-500 to-amber-400" },
-    Australia: { x: 84, y: 78, color: "from-purple-500 to-indigo-400" },
-  };
+// Mapping country names to coordinates on our SVG stage (0-100 scale)
+const countryLocations: Record<string, { x: number; y: number; color: string }> = {
+  USA: { x: 22, y: 35, color: "from-orange-500 to-amber-400" },
+  Canada: { x: 24, y: 22, color: "from-amber-500 to-yellow-400" },
+  Mexico: { x: 20, y: 46, color: "from-red-500 to-orange-400" },
+  Colombia: { x: 28, y: 56, color: "from-yellow-500 to-orange-400" },
+  Brazil: { x: 33, y: 68, color: "from-pink-500 to-rose-400" },
+  Peru: { x: 27, y: 64, color: "from-emerald-500 to-teal-400" },
+  Chile: { x: 28, y: 80, color: "from-blue-500 to-indigo-400" },
+  Argentina: { x: 32, y: 82, color: "from-purple-500 to-pink-400" },
+  UK: { x: 46, y: 27, color: "from-cyan-500 to-blue-400" },
+  France: { x: 48, y: 33, color: "from-blue-500 to-teal-400" },
+  Germany: { x: 50, y: 29, color: "from-indigo-500 to-purple-400" },
+  Spain: { x: 46, y: 38, color: "from-orange-500 to-yellow-400" },
+  Italy: { x: 51, y: 35, color: "from-green-500 to-emerald-400" },
+  Netherlands: { x: 49, y: 28, color: "from-cyan-500 to-teal-400" },
+  "South Korea": { x: 79, y: 38, color: "from-pink-500 to-purple-400" },
+  Japan: { x: 82, y: 38, color: "from-red-500 to-pink-400" },
+  Philippines: { x: 78, y: 52, color: "from-amber-500 to-orange-400" },
+  Indonesia: { x: 76, y: 61, color: "from-teal-500 to-emerald-400" },
+  India: { x: 67, y: 46, color: "from-orange-500 to-yellow-400" },
+  Thailand: { x: 74, y: 51, color: "from-yellow-500 to-amber-400" },
+  Australia: { x: 84, y: 78, color: "from-purple-500 to-indigo-400" },
+};
 
+export default function WorldHeatMap({ globalReach }: WorldHeatMapProps) {
   const activeLocations = useMemo(() => {
     return globalReach
       .map((country) => {
@@ -91,7 +90,7 @@ export default function WorldHeatMap({ globalReach }: WorldHeatMapProps) {
         </svg>
 
         {/* Dynamic Glowing Hotspot Overlays */}
-        {activeLocations.map((loc, i) => (
+        {activeLocations.map((loc) => (
           <div
             key={loc.name}
             className="absolute -translate-x-1/2 -translate-y-1/2 group"

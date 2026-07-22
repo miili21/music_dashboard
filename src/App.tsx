@@ -15,39 +15,53 @@ import TopArtists from "./components/TopArtists";
 import AnalyticsCharts from "./components/AnalyticsCharts";
 import NewReleases from "./components/NewReleases";
 import ArtistProfileView from "./components/ArtistProfileView";
+import AlbumProfileView from "./components/AlbumProfileView";
+import AlbumSongsSidebar from "./components/AlbumSongsSidebar";
 import { artists } from "./data/artists";
 import { songs } from "./data/songs";
 import { albums } from "./data/albums";
-import { AlertCircle, Trophy, Globe, Heart, Play, Pause, ChevronRight, Eye, Star, Info, User } from "lucide-react";
+import { AlertCircle, Trophy, Heart, User, ChevronRight } from "lucide-react";
 
 export default function App() {
   const dashboardRef = useRef<HTMLDivElement>(null);
- // Navigation & View states
- const [viewMode, setViewMode] = useState<"dashboard" | "artist" | "songs" | "albums">("dashboard");
- const [selectedArtistId, setSelectedArtistId] = useState<number>(1); // Default to Sabrina Carpenter
- const [searchQuery, setSearchQuery] = useState("");
- const [language, setLanguage] = useState<"es" | "en">("es"); // Default to Spanish as requested/shown
+  // Navigation & View states
+  const [viewMode, setViewMode] = useState<"dashboard" | "artist" | "songs" | "albums" | "album_detail">("dashboard");
+  const [selectedArtistId, setSelectedArtistId] = useState<number>(1); // Default to Sabrina Carpenter
+  const [selectedAlbumId, setSelectedAlbumId] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [language, setLanguage] = useState<"es" | "en">("es"); // Default to Spanish as requested/shown
 
- // User-specific states (favorites & recently viewed lists)
- const [favorites, setFavorites] = useState<number[]>([1, 2, 4, 8]); // Default initial favorites
- const [recentlyViewed, setRecentlyViewed] = useState<number[]>([3, 5, 6]);
+  // User-specific states (favorites & recently viewed lists)
+  const [favorites, setFavorites] = useState<number[]>([1, 2, 4, 8]); // Default initial favorites
+  const [recentlyViewed, setRecentlyViewed] = useState<number[]>([3, 5, 6]);
 
- // Audio player mock indicator for the active artist
- const [isPlaying, setIsPlaying] = useState(false);
+  // Audio player mock indicator for the active artist
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Scroll to dashboard smoothly
   const handleScrollToDashboard = () => {
     dashboardRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-   // Helper to change artist and automatically track recently viewed & switch view to artist detail
-   const handleSelectArtist = (id: number) => {
+  // Helper to change artist and automatically track recently viewed & switch view to artist detail
+  const handleSelectArtist = (id: number) => {
     setSelectedArtistId(id);
     setRecentlyViewed((prev) => {
       const filtered = prev.filter((x) => x !== id);
       return [id, ...filtered].slice(0, 5);
     });
     setViewMode("artist");
+    setSearchQuery(""); // Clear search bar
+  };
+
+  // Helper to switch to detailed album view
+  const handleSelectAlbum = (id: number) => {
+    setSelectedAlbumId(id);
+    const targetAlbum = albums.find((al) => al.id === id);
+    if (targetAlbum) {
+      setSelectedArtistId(targetAlbum.artistId);
+    }
+    setViewMode("album_detail");
     setSearchQuery(""); // Clear search bar
   };
 
@@ -84,90 +98,98 @@ export default function App() {
     return artists.find(a => a.id === selectedArtistId) || artists[0];
   }, [selectedArtistId]);
 
-// Get current artist's albums
-const currentArtistAlbums = useMemo(() => {
-  return albums.filter((al) => al.artistId === selectedArtistId);
-}, [selectedArtistId]);
+  // Get current artist's albums
+  const currentArtistAlbums = useMemo(() => {
+    return albums.filter((al) => al.artistId === selectedArtistId);
+  }, [selectedArtistId]);
 
-// Get current artist's songs
-const currentArtistSongs = useMemo(() => {
-  return songs.filter((s) => s.artistId === selectedArtistId);
-}, [selectedArtistId]);
+  // Active selected album
+  const activeAlbum = useMemo(() => {
+    const found = albums.find((al) => al.id === selectedAlbumId);
+    if (found && found.artistId === selectedArtistId) return found;
+    return currentArtistAlbums[0] || albums[0];
+  }, [currentArtistAlbums, selectedAlbumId, selectedArtistId]);
 
-// Translation mapping for dashboard elements
-const t = {
-  en: {
-    breadcrumbHome: "Home",
-    breadcrumbArtist: "Artist",
-    breadcrumbDashboard: "Dashboard",
-    rankedLive: "Ranked Live",
-    keyMetrics: "Key Metrics",
-    conversionRate: "Conversion Rate",
-    subscriptionEarning: "Subscription Earning",
-    netBenefits: "Net Benefits",
-    topSongsTitle: "Top songs of the moment",
-    top5Title: "Top 5 Artists of the Moment",
-    newReleases: "New Releases",
-    edition: "2026 Edition",
-    searchHint: "Search artist, song, or album...",
-    tracksTabHeader: "Detailed Track Analytics",
-    albumsTabHeader: "Album ROI & Break-Even Performance",
-    playPreview: "PLAY PREVIEW",
-    pausePreview: "PAUSE PREVIEW",
-    totalViews: "Total Views",
-    earnings: "Earnings",
-    roi: "ROI",
-    cost: "Production Cost",
-  },
-  es: {
-    breadcrumbHome: "Inicio",
-    breadcrumbArtist: "Artista",
-    breadcrumbDashboard: "Consola",
-    rankedLive: "Clasificado en Vivo",
-    keyMetrics: "Métricas Clave",
-    conversionRate: "Conversión de Oyentes",
-    subscriptionEarning: "Ingresos por Suscripción",
-    netBenefits: "Beneficio Neto",
-    topSongsTitle: "Canciones populares del momento",
-    top5Title: "Los 5 mejores artistas del momento",
-    newReleases: "Nuevos Lanzamientos",
-    edition: "Edición 2026",
-    searchHint: "Buscar artista, canción o álbum...",
-    tracksTabHeader: "Análisis Detallado de Canciones",
-    albumsTabHeader: "Rendimiento ROI y Punto de Equilibrio de Álbumes",
-    playPreview: "REPRODUCIR PREVIA",
-    pausePreview: "PAUSAR PREVIA",
-    totalViews: "Vistas Totales",
-    earnings: "Ganancias",
-    roi: "Retorno (ROI)",
-    cost: "Costo de Producción",
-  },
-}[language];
 
-// Sync menu active tab selection with our viewModes
-const handleMenuTabChange = (tab: string) => {
-  if (tab === "artist") {
-    setViewMode("artist");
-  } else if (tab === "songs") {
-    setViewMode("songs");
-  } else if (tab === "albums") {
-    setViewMode("albums");
-  } else {
-    setViewMode("dashboard");
-  }
-};
+  // Get current artist's songs
+  const currentArtistSongs = useMemo(() => {
+    return songs.filter((s) => s.artistId === selectedArtistId);
+  }, [selectedArtistId]);
 
-// Convert viewMode string back to LeftMenu tab identifier
-const activeMenuTab = useMemo(() => {
-  if (viewMode === "artist") return "artist";
-  if (viewMode === "songs") return "songs";
-  if (viewMode === "albums") return "albums";
-  return "";
-}, [viewMode]);
+  // Translation mapping for dashboard elements
+  const t = {
+    en: {
+      breadcrumbHome: "Home",
+      breadcrumbArtist: "Artist",
+      breadcrumbDashboard: "Dashboard",
+      rankedLive: "Ranked Live",
+      keyMetrics: "Key Metrics",
+      conversionRate: "Conversion Rate",
+      subscriptionEarning: "Subscription Earning",
+      netBenefits: "Net Benefits",
+      topSongsTitle: "Top songs of the moment",
+      top5Title: "Top 5 Artists of the Moment",
+      newReleases: "New Releases",
+      edition: "2026 Edition",
+      searchHint: "Search artist, song, or album...",
+      tracksTabHeader: "Detailed Track Analytics",
+      albumsTabHeader: "Album ROI & Break-Even Performance",
+      playPreview: "PLAY PREVIEW",
+      pausePreview: "PAUSE PREVIEW",
+      totalViews: "Total Views",
+      earnings: "Earnings",
+      roi: "ROI",
+      cost: "Production Cost",
+    },
+    es: {
+      breadcrumbHome: "Inicio",
+      breadcrumbArtist: "Artista",
+      breadcrumbDashboard: "Consola",
+      rankedLive: "Clasificado en Vivo",
+      keyMetrics: "Métricas Clave",
+      conversionRate: "Conversión de Oyentes",
+      subscriptionEarning: "Ingresos por Suscripción",
+      netBenefits: "Beneficio Neto",
+      topSongsTitle: "Canciones populares del momento",
+      top5Title: "Los 5 mejores artistas del momento",
+      newReleases: "Nuevos Lanzamientos",
+      edition: "Edición 2026",
+      searchHint: "Buscar artista, canción o álbum...",
+      tracksTabHeader: "Análisis Detallado de Canciones",
+      albumsTabHeader: "Rendimiento ROI y Punto de Equilibrio de Álbumes",
+      playPreview: "REPRODUCIR PREVIA",
+      pausePreview: "PAUSAR PREVIA",
+      totalViews: "Vistas Totales",
+      earnings: "Ganancias",
+      roi: "Retorno (ROI)",
+      cost: "Costo de Producción",
+    },
+  }[language];
+
+  // Sync menu active tab selection with our viewModes
+  const handleMenuTabChange = (tab: string) => {
+    if (tab === "artist") {
+      setViewMode("artist");
+    } else if (tab === "songs") {
+      setViewMode("songs");
+    } else if (tab === "albums") {
+      setViewMode("albums");
+    } else {
+      setViewMode("dashboard");
+    }
+  };
+
+  // Convert viewMode string back to LeftMenu tab identifier
+  const activeMenuTab = useMemo(() => {
+    if (viewMode === "artist") return "artist";
+    if (viewMode === "songs") return "songs";
+    if (viewMode === "albums") return "albums";
+    return "";
+  }, [viewMode]);
 
   return (
     <div className="relative w-full min-h-screen bg-black overflow-x-hidden text-white font-sans selection:bg-pink-500 selection:text-white">
-      
+
       {/* SECTION 1: Welcome/Hero View */}
       <WelcomeScreen onExplore={handleScrollToDashboard} />
 
@@ -182,7 +204,7 @@ const activeMenuTab = useMemo(() => {
 
         {/* Outer container restricting content width and aligning 3 major areas */}
         <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-20">
-          
+
           {/* AREA 1: STATIC LEFT COLUMN (Menu remains static/sticky) */}
           <div className="lg:col-span-2 flex justify-start items-start">
             <div className="sticky top-12 w-full">
@@ -197,7 +219,7 @@ const activeMenuTab = useMemo(() => {
                 language={language}
                 setLanguage={setLanguage}
               />
-              
+
               {/* Back to Home/Dashboard button */}
               {viewMode !== "dashboard" && (
                 <motion.button
@@ -213,25 +235,37 @@ const activeMenuTab = useMemo(() => {
           </div>
 
           {/* AREA 2: CENTRAL CONTAINER (Scrollable area, holding search and active content views) */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            
+          <div className={`flex flex-col gap-6 transition-all duration-300 ${viewMode === "album_detail" ? "lg:col-span-10" : "lg:col-span-7"}`}>
+
             {/* Sticky Breadcrumb + Header bar */}
             <div className="w-full flex items-center justify-between px-2 text-neutral-400 text-xs font-mono select-none">
               <div className="flex items-center gap-1.5 uppercase tracking-widest">
-                <button onClick={() => setViewMode("dashboard")} className="hover:text-white transition">
+                <button onClick={() => setViewMode("dashboard")} className="hover:text-white transition font-bold">
                   {t.breadcrumbHome}
                 </button>
                 <span>&gt;</span>
-                <span className="text-white">
-                  {viewMode === "dashboard" ? t.breadcrumbDashboard : t.breadcrumbArtist}
-                </span>
-                <span>&gt;</span>
-                <span className="text-pink-500 font-bold">{currentArtist.name}</span>
+                {viewMode === "album_detail" ? (
+                  <>
+                    <button onClick={() => setViewMode("albums")} className="hover:text-white transition uppercase">
+                      {language === "es" ? "Álbumes" : "Albums"}
+                    </button>
+                    <span>&gt;</span>
+                    <span className="text-pink-500 font-bold uppercase font-mono">{(albums.find(a => a.id === selectedAlbumId) || albums[0]).titleAlbum}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-white">
+                      {viewMode === "dashboard" ? t.breadcrumbDashboard : t.breadcrumbArtist}
+                    </span>
+                    <span>&gt;</span>
+                    <span className="text-pink-500 font-bold">{currentArtist.name}</span>
+                  </>
+                )}
               </div>
 
               {/* Developer badge info */}
               <div className="flex items-center gap-2">
-                <span className="text-[9px] tracking-wider text-neutral-500 font-bold uppercase">My profile</span>
+                <span className="text-[9px] tracking-wider text-neutral-500 font-bold uppercase">My Profile</span>
                 <div className="w-8 h-8 rounded-full border border-pink-500/40 p-0.5 overflow-hidden">
                   <img
                     src="https://picsum.photos/seed/user-avatar/100"
@@ -279,7 +313,7 @@ const activeMenuTab = useMemo(() => {
                               <button
                                 key={a.id}
                                 onClick={() => handleSelectArtist(a.id)}
-                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/2 hover:bg-pink-500/10 border border-transparent hover:border-pink-500/20 text-xs text-left text-neutral-200 transition"
+                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02] hover:bg-pink-500/10 border border-transparent hover:border-pink-500/20 text-xs text-left text-neutral-200 transition"
                               >
                                 <img src={a.avatarUrl} className="w-5 h-5 rounded-full object-cover" />
                                 <span className="truncate">{a.name}</span>
@@ -297,8 +331,8 @@ const activeMenuTab = useMemo(() => {
                             {searchResults.songs.map((s) => (
                               <button
                                 key={s.id}
-                                onClick={() => handleSelectArtist(s.artistId)}
-                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/2 hover:bg-orange-500/10 border border-transparent hover:border-orange-500/20 text-xs text-left text-neutral-200 transition"
+                                onClick={() => handleSelectAlbum(s.albumId)}
+                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02] hover:bg-orange-500/10 border border-transparent hover:border-orange-500/20 text-xs text-left text-neutral-200 transition"
                               >
                                 <img src={s.coverUrl} className="w-5 h-5 rounded object-cover" />
                                 <span className="truncate">{s.titleSong}</span>
@@ -316,8 +350,8 @@ const activeMenuTab = useMemo(() => {
                             {searchResults.albums.map((al) => (
                               <button
                                 key={al.id}
-                                onClick={() => handleSelectArtist(al.artistId)}
-                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/2 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 text-xs text-left text-neutral-200 transition"
+                                onClick={() => handleSelectAlbum(al.id)}
+                                className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02] hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 text-xs text-left text-neutral-200 transition"
                               >
                                 <img src={al.coverUrl} className="w-5 h-5 rounded object-cover" />
                                 <span className="truncate">{al.titleAlbum}</span>
@@ -348,7 +382,7 @@ const activeMenuTab = useMemo(() => {
                   <TopCloudAlbums selectedId={selectedArtistId} onSelect={handleSelectArtist} />
 
                   {/* Carousel list of Top 5 Artists of the Moment */}
-                  <div className="rounded-3xl border border-white/5 bg-white/1 backdrop-blur-lg p-6 shadow-2xl space-y-6">
+                  <div className="rounded-3xl border border-white/5 bg-white/[0.01] backdrop-blur-lg p-6 shadow-2xl space-y-6">
                     <TopArtists selectedArtistId={selectedArtistId} onSelectArtist={handleSelectArtist} />
 
                     {/* Divider */}
@@ -361,7 +395,7 @@ const activeMenuTab = useMemo(() => {
                           <Trophy className="w-3.5 h-3.5 text-yellow-500" />
                           {currentArtist.name}
                         </span>
-                        
+
                         <button
                           onClick={() => handleToggleFavorite(selectedArtistId)}
                           className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-neutral-300 hover:text-pink-500 hover:bg-pink-500/5 transition duration-300"
@@ -371,7 +405,6 @@ const activeMenuTab = useMemo(() => {
                         </button>
                       </div>
 
-                      
                     </div>
                   </div>
 
@@ -419,7 +452,7 @@ const activeMenuTab = useMemo(() => {
                       {currentArtistSongs.map((song) => (
                         <div
                           key={song.id}
-                          className="flex flex-wrap items-center justify-between p-3 rounded-2xl border border-white/5 bg-white/1 hover:bg-white/4 transition duration-300"
+                          className="flex flex-wrap items-center justify-between p-3 rounded-2xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.04] transition duration-300"
                         >
                           <div className="flex items-center gap-3">
                             <img src={song.coverUrl} className="w-10 h-10 rounded-xl object-cover border border-white/10" />
@@ -469,43 +502,90 @@ const activeMenuTab = useMemo(() => {
                     </div>
 
                     <div className="space-y-4">
-                      {currentArtistAlbums.map((album) => (
-                        <div
-                          key={album.id}
-                          className="p-4 rounded-2xl border border-white/5 bg-white/1 space-y-4 hover:bg-white/3 transition duration-300"
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                              <img src={album.coverUrl} className="w-12 h-12 rounded-xl object-cover border border-white/10" />
-                              <div>
-                                <h4 className="text-sm font-bold text-white">{album.titleAlbum}</h4>
-                                <p className="text-[10px] text-neutral-400 italic max-w-xs">{album.description}</p>
+                      {currentArtistAlbums.map((album) => {
+                        const isSelected = album.id === activeAlbum.id;
+                        return (
+                          <div
+                            key={album.id}
+                            onClick={() => setSelectedAlbumId(album.id)}
+                            className={`p-4 rounded-2xl border transition duration-300 cursor-pointer space-y-4 ${isSelected
+                              ? "border-purple-500/60 bg-purple-500/10 shadow-lg shadow-purple-950/20"
+                              : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-purple-500/30"
+                              }`}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-center gap-3">
+                                <img src={album.coverUrl} className="w-12 h-12 rounded-xl object-cover border border-white/10" />
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="text-sm font-bold text-white">{album.titleAlbum}</h4>
+                                    {isSelected && (
+                                      <span className="text-[9px] font-mono text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/40 font-bold">
+                                        {language === "es" ? "Seleccionado" : "Selected"}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] text-neutral-400 italic max-w-xs">{album.description}</p>
+                                </div>
+                              </div>
+                              <div className="text-right font-mono">
+                                <span className="text-[9px] text-neutral-500 block uppercase">{t.roi}</span>
+                                <span className="text-sm font-black text-pink-500">{album.roi}%</span>
                               </div>
                             </div>
-                            <div className="text-right font-mono">
-                              <span className="text-[9px] text-neutral-500 block uppercase">{t.roi}</span>
-                              <span className="text-sm font-black text-pink-500">{album.roi}%</span>
-                            </div>
-                          </div>
 
-                          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/5 font-mono text-center">
-                            <div>
-                              <span className="text-[9px] text-neutral-500 block uppercase">{t.earnings}</span>
-                              <span className="text-xs font-bold text-neutral-200">${(album.revenue / 1000000).toFixed(1)}M</span>
+                            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/5 font-mono text-center">
+                              <div>
+                                <span className="text-[9px] text-neutral-500 block uppercase">{t.earnings}</span>
+                                <span className="text-xs font-bold text-neutral-200">${(album.revenue / 1000000).toFixed(1)}M</span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] text-neutral-500 block uppercase">{t.cost}</span>
+                                <span className="text-xs font-bold text-neutral-400">${(album.productionCost / 1000000).toFixed(1)}M</span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] text-neutral-500 block uppercase">Break Even</span>
+                                <span className="text-xs font-bold text-neutral-400">{album.breakEven.toLocaleString()} units</span>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-[9px] text-neutral-500 block uppercase">{t.cost}</span>
-                              <span className="text-xs font-bold text-neutral-400">${(album.productionCost / 1000000).toFixed(1)}M</span>
-                            </div>
-                            <div>
-                              <span className="text-[9px] text-neutral-500 block uppercase">Break Even</span>
-                              <span className="text-xs font-bold text-neutral-400">{album.breakEven.toLocaleString()} units</span>
+
+                            <div className="flex justify-end pt-2 border-t border-white/5">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelectAlbum(album.id);
+                                }}
+                                className="text-[10px] font-mono font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition"
+                              >
+                                <span>{language === "es" ? "Ver perfil del álbum" : "View album profile"}</span>
+                                <ChevronRight className="w-3 h-3" />
+                              </button>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
+                </motion.div>
+              )}
+
+              {/* VIEW 5: ENRICHED DETAILED ALBUM VIEW */}
+              {viewMode === "album_detail" && (
+                <motion.div
+                  key="album-detail-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <AlbumProfileView
+                    album={albums.find((a) => a.id === selectedAlbumId) || albums[0]}
+                    language={language}
+                    onSongSelect={(songId) => {
+                      // Selecting a track can highlight or play
+                      setIsPlaying(true);
+                    }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -513,8 +593,43 @@ const activeMenuTab = useMemo(() => {
 
           {/* AREA 3: STATIC RIGHT SIDEBAR / PORTRAIT COLUMN */}
           <div className="lg:col-span-3">
-            {/* If we are on general dashboard: render the scrollable list of new releases */}
-            {viewMode !== "artist" ? (
+            {viewMode === "albums" ? (
+              /* Specialized side list for the Albums screen: Songs of the selected album */
+              <div className="sticky top-12">
+                <AlbumSongsSidebar
+                  album={activeAlbum}
+                  artist={currentArtist}
+                  language={language}
+                  allArtistAlbums={currentArtistAlbums}
+                  onSelectAlbum={(id: number) => setSelectedAlbumId(id)}
+                  onSelectSong={() => setIsPlaying(true)}
+                  onOpenAlbumDetail={(id: number) => handleSelectAlbum(id)}
+                />
+              </div>
+            ) : viewMode === "album_detail" ? (
+              /* If we are on detailed album view: render the static Big Album Cover on the right side of the screen */
+              <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
+                {/* Horizontal black mask to blend photo cleanly into the middle content column */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black via-transparent to-transparent z-20"></div>
+                {/* Vertical black mask to blend photo cleanly into the bottom floor */}
+                <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-gradient-to-t from-black via-black/40 to-transparent z-20"></div>
+
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={selectedAlbumId}
+                    src={(albums.find((a) => a.id === selectedAlbumId) || albums[0]).coverUrl}
+                    alt={(albums.find((a) => a.id === selectedAlbumId) || albums[0]).titleAlbum}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 0.88, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="w-full h-full object-cover object-center"
+                    referrerPolicy="no-referrer"
+                  />
+                </AnimatePresence>
+              </div>
+            ) : viewMode !== "artist" ? (
+              /* If we are on general dashboard: render the scrollable list of new releases */
               <div className="sticky top-12">
                 <NewReleases onSelectArtist={handleSelectArtist} selectedArtistId={selectedArtistId} />
               </div>
@@ -522,9 +637,9 @@ const activeMenuTab = useMemo(() => {
               /* If we are on detailed artist view: render the static Big Artist Portrait (keeps fixed/static as requested) */
               <div className="hidden lg:block fixed top-0 right-0 h-screen w-[26vw] z-10 pointer-events-none overflow-hidden select-none">
                 {/* Horizontal black mask to blend photo cleanly into the middle content column */}
-                <div className="absolute inset-y-0 left-0 w-24 bg-linear-to-r from-black via-transparent to-transparent z-20"></div>
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black via-transparent to-transparent z-20"></div>
                 {/* Vertical black mask to blend photo cleanly into the bottom floor */}
-                <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-linear-to-t from-black via-black/40 to-transparent z-20"></div>
+                <div className="absolute inset-x-0 bottom-0 h-[35vh] bg-gradient-to-t from-black via-black/40 to-transparent z-20"></div>
 
                 <AnimatePresence mode="wait">
                   <motion.img

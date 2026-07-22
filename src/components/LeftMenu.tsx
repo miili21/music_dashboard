@@ -1,4 +1,4 @@
-import { Heart, Globe, Disc, Music, User, Flame, Clock, Languages } from "lucide-react";
+import { Heart, Globe, Disc, Music, User, Clock } from "lucide-react";
 import { artists } from "../data/artists";
 import { useState } from "react";
 
@@ -6,7 +6,7 @@ interface LeftMenuProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   favorites: number[];
-  toggleFavorite: (id: number) => void;
+  toggleFavorite?: (id: number) => void;
   recentlyViewed: number[];
   onSelectArtist: (id: number) => void;
   selectedArtistId: number;
@@ -143,7 +143,7 @@ export default function LeftMenu({
                   }`}
                   title={a.name}
                 >
-                  <img src={a.avatarUrl} className="w-4 h-4 rounded-full object-cover" />
+                  <img src={a.avatarUrl} alt={a.name} className="w-4 h-4 rounded-full object-cover" />
                   <span className="truncate">{a.name.split(" ")[0]}</span>
                 </button>
               ))
@@ -169,7 +169,7 @@ export default function LeftMenu({
                   className="w-full flex items-center gap-2 px-2 py-1 rounded-lg text-[11px] text-left text-neutral-400 hover:text-white transition"
                   title={a.name}
                 >
-                  <img src={a.avatarUrl} className="w-4 h-4 rounded-full object-cover" />
+                  <img src={a.avatarUrl} alt={a.name} className="w-4 h-4 rounded-full object-cover" />
                   <span className="truncate">{a.name.split(" ")[0]}</span>
                 </button>
               ))
