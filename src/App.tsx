@@ -8,8 +8,7 @@
 import { useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WelcomeScreen from "./components/WelcomeScreen";
-import LeftMenu from "./components/LeftMenu";
-import SearchBar from "./components/SearchBar";
+import TopNavBar from "./components/TopNavBar";
 import TopCloudAlbums from "./components/TopCloudAlbums";
 import TopArtists from "./components/TopArtists";
 import AnalyticsCharts from "./components/AnalyticsCharts";
@@ -208,94 +207,38 @@ export default function App() {
       {/* SECTION 1: Welcome/Hero View */}
       <WelcomeScreen onExplore={handleScrollToDashboard} />
 
-      {/* SECTION 2: Dashboard Container */}
+      {/* SECTION 2: Dashboard Container with Top Navigation Bar */}
       <div
         ref={dashboardRef}
-        className="min-h-screen w-full relative bg-[#060606] px-3 sm:px-6 md:px-8 py-4 sm:py-8 flex justify-center border-t border-white/5"
+        className="min-h-screen w-full relative bg-[#060606] flex flex-col items-center border-t border-white/5 pb-16"
       >
+        {/* Sticky Top Navigation Bar spanning full width */}
+        <TopNavBar
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          currentArtist={currentArtist}
+          currentAlbum={activeAlbum}
+          currentSong={activeSong}
+          searchQuery={searchQuery}
+          onSearch={setSearchQuery}
+          favorites={favorites}
+          toggleFavorite={handleToggleFavorite}
+          recentlyViewed={recentlyViewed}
+          onSelectArtist={handleSelectArtist}
+          language={language}
+          setLanguage={setLanguage}
+        />
+
         {/* Glow ambient spots behind dashboard to replicate high contrast image glow */}
         <div className="absolute top-20 left-1/3 w-[30vw] h-[30vw] rounded-full bg-pink-500/5 blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-20 right-1/4 w-[30vw] h-[30vw] rounded-full bg-orange-500/5 blur-[120px] pointer-events-none"></div>
 
-        {/* Outer container restricting content width and aligning 3 major areas */}
-        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 relative z-20">
+        {/* Main Content Area Container */}
+        <div className="max-w-7xl w-full px-3 sm:px-6 md:px-8 pt-6 relative z-20">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-20">
 
-          {/* AREA 1: STATIC LEFT COLUMN (Menu remains static/sticky) */}
-          <div className="lg:col-span-2 flex justify-start items-start w-full">
-            <div className="relative lg:sticky lg:top-12 w-full">
-              <LeftMenu
-                activeTab={activeMenuTab}
-                setActiveTab={handleMenuTabChange}
-                favorites={favorites}
-                toggleFavorite={handleToggleFavorite}
-                recentlyViewed={recentlyViewed}
-                onSelectArtist={handleSelectArtist}
-                selectedArtistId={selectedArtistId}
-                language={language}
-                setLanguage={setLanguage}
-              />
-
-              {/* Back to Home/Dashboard button */}
-              {viewMode !== "dashboard" && (
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={() => setViewMode("dashboard")}
-                  className="w-full mt-2 lg:mt-4 flex items-center justify-center gap-1.5 py-2 px-3 sm:px-4 rounded-full border border-white/10 bg-white/[0.02] text-xs font-bold uppercase tracking-wider text-neutral-300 hover:text-white hover:bg-white/[0.06] transition"
-                >
-                  &larr; {language === "es" ? "Panel General" : "Main Dashboard"}
-                </motion.button>
-              )}
-            </div>
-          </div>
-
-          {/* AREA 2: CENTRAL CONTAINER (Scrollable area, holding search and active content views) */}
-          <div className={`flex flex-col gap-6 transition-all duration-300 ${viewMode === "album_detail" ? "lg:col-span-10" : "lg:col-span-7"}`}>
-
-            {/* Sticky Breadcrumb + Header bar */}
-            <div className="w-full flex items-center justify-between px-2 text-neutral-400 text-xs font-mono select-none">
-              <div className="flex items-center gap-1.5 uppercase tracking-widest">
-                <button onClick={() => setViewMode("dashboard")} className="hover:text-white transition font-bold">
-                  {t.breadcrumbHome}
-                </button>
-                <span>&gt;</span>
-                {viewMode === "album_detail" ? (
-                  <>
-                    <button onClick={() => setViewMode("albums")} className="hover:text-white transition uppercase">
-                      {language === "es" ? "Álbumes" : "Albums"}
-                    </button>
-                    <span>&gt;</span>
-                    <span className="text-pink-500 font-bold uppercase font-mono">{(albums.find(a => a.id === selectedAlbumId) || albums[0]).titleAlbum}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-white">
-                      {viewMode === "dashboard" ? t.breadcrumbDashboard : t.breadcrumbArtist}
-                    </span>
-                    <span>&gt;</span>
-                    <span className="text-pink-500 font-bold">{currentArtist.name}</span>
-                  </>
-                )}
-              </div>
-
-              {/* Developer badge info */}
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] tracking-wider text-neutral-500 font-bold uppercase">My Profile</span>
-                <div className="w-8 h-8 rounded-full border border-pink-500/40 p-0.5 overflow-hidden">
-                  <img
-                    src="https://picsum.photos/seed/user-avatar/100"
-                    alt="User"
-                    className="w-full h-full object-cover rounded-full"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Static Sticky Search Bar at top of scrolling central panel */}
-            <div className="sticky top-0 z-40 bg-[#060606]/80 backdrop-blur-md pt-2 pb-4 -mx-2 px-2 rounded-2xl">
-              <SearchBar searchQuery={searchQuery} onSearch={setSearchQuery} />
-            </div>
+            {/* CENTRAL CONTENT CONTAINER */}
+            <div className={`flex flex-col gap-6 transition-all duration-300 ${(viewMode === "songs" || viewMode === "song_detail") ? "lg:col-span-12" : "lg:col-span-9"}`}>
 
             {/* Live Search Overlay Results */}
             <AnimatePresence>
@@ -658,6 +601,7 @@ export default function App() {
               )}
             </div>
           )}
+                  </div>
         </div>
       </div>
     </div>
