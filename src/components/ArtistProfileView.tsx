@@ -168,7 +168,7 @@ export default function ArtistProfileView({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono tracking-widest uppercase text-neutral-400">
-                Last Album
+                Top Song
               </span>
               <span className="text-[9px] font-mono text-pink-500 bg-pink-500/10 px-2 py-0.5 rounded border border-pink-500/20">
                 {artist.bannerSong.album}

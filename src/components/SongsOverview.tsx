@@ -55,24 +55,25 @@ export default function SongsOverview({
         },
     }[language];
 
-    // Filtered albums list based on selected artist filter
+    // Options available for the album filter based ON strictly selected artist
+    const availableAlbumsForFilter = useMemo(() => {
+        if (selectedArtistFilter === "all") return albums;
+        return albums.filter((al) => al.artistId === selectedArtistFilter);
+    }, [selectedArtistFilter]);
+
+    // Filtered albums list for rendering
     const filteredAlbums = useMemo(() => {
-        let result = albums;
-        if (selectedArtistFilter !== "all") {
-            result = result.filter((al) => al.artistId === selectedArtistFilter);
-        }
+        let result = availableAlbumsForFilter;
         if (selectedAlbumFilter !== "all") {
             result = result.filter((al) => al.id === selectedAlbumFilter);
         }
         return result;
-    }, [selectedArtistFilter, selectedAlbumFilter]);
+    }, [availableAlbumsForFilter, selectedAlbumFilter]);
 
-    // Sort songs helper
-    const sortSongsList = (list: Song[]) => {
-        return [...list].sort((a, b) => {
-            if (sortBy === "views_asc") return a.totalViews - b.totalViews;
-            return b.totalViews - a.totalViews;
-        });
+    // Handle Artist change safely
+    const handleArtistChange = (val: number | "all") => {
+        setSelectedArtistFilter(val);
+        setSelectedAlbumFilter("all"); // Reset album selection to avoid empty states
     };
 
     return (
@@ -115,8 +116,7 @@ export default function SongsOverview({
                                 value={selectedArtistFilter}
                                 onChange={(e) => {
                                     const val = e.target.value === "all" ? "all" : Number(e.target.value);
-                                    setSelectedArtistFilter(val);
-                                    setSelectedAlbumFilter("all"); // reset album filter when artist changes
+                                    handleArtistChange(val);
                                 }}
                                 className="bg-transparent text-white outline-none cursor-pointer font-bold"
                             >
@@ -137,7 +137,7 @@ export default function SongsOverview({
                                 className="bg-transparent text-white outline-none cursor-pointer font-bold max-w-[160px] truncate"
                             >
                                 <option value="all" className="bg-neutral-900 text-white">{t.allAlbums}</option>
-                                {(selectedArtistFilter === "all" ? albums : albums.filter(al => al.artistId === selectedArtistFilter)).map((al) => (
+                                {availableAlbumsForFilter.map((al) => (
                                     <option key={al.id} value={al.id} className="bg-neutral-900 text-white">
                                         {al.titleAlbum}
                                     </option>
@@ -155,9 +155,8 @@ export default function SongsOverview({
                             onChange={(e) => setSortBy(e.target.value as "views_desc" | "views_asc")}
                             className="bg-transparent text-pink-400 font-bold outline-none cursor-pointer"
                         >
-                          <option value="views_desc" className="bg-neutral-900 text-white">{t.viewsDesc}</option>
-                          <option value="views_asc" className="bg-neutral-900 text-white">{t.viewsAsc}</option>
-
+                            <option value="views_desc" className="bg-neutral-900 text-white">{t.viewsDesc}</option>
+                            <option value="views_asc" className="bg-neutral-900 text-white">{t.viewsAsc}</option>
                         </select>
                     </div>
 
@@ -169,7 +168,11 @@ export default function SongsOverview({
                 {filteredAlbums.map((album) => {
                     const albumArtist = artists.find((a) => a.id === album.artistId) || artists[0];
                     const albumSongs = songs.filter((s) => s.albumId === album.id);
-                    const sortedSongs = sortSongsList(albumSongs);
+                    
+                    const sortedSongs = [...albumSongs].sort((a, b) => {
+                        if (sortBy === "views_asc") return a.totalViews - b.totalViews;
+                        return b.totalViews - a.totalViews;
+                    });
 
                     if (sortedSongs.length === 0) return null;
 
@@ -254,7 +257,7 @@ export default function SongsOverview({
                                                 </div>
 
                                                 <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-                                                <span className="text-neutral-300 font-bold">{(song.totalViews / 1000000).toFixed(0)}M vistas</span>
+                                                    <span className="text-neutral-300 font-bold">{(song.totalViews / 1000000).toFixed(0)}M vistas</span>
                                                     <span>&bull;</span>
                                                     <span className="text-emerald-400 font-bold">${(song.kpis.earnings / 1000000).toFixed(1)}M</span>
                                                 </div>
