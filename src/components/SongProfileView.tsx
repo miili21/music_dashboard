@@ -81,29 +81,16 @@ export default function SongProfileView({
 
                 {/* LEFT CONTENT AREA: Song Title, Metrics & Platform Pills */}
                 <div className="relative z-10 space-y-2.5 max-w-xl text-left w-full md:w-2/3">
-                    {/* Song selector dropdown & Artist / Album metadata */}
+                 {/* Artist / Album metadata */}
                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-mono text-white/90">
                         <span className="bg-black/40 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest text-[9px] sm:text-[10px] font-bold truncate max-w-[200px] sm:max-w-none">
                             {artist.name} &bull; {album.titleAlbum} ({song.year})
                         </span>
 
-                        {/* Quick Song Switcher */}
-                        <select
-                            value={song.id}
-                            onChange={(e) => onSelectSong(Number(e.target.value))}
-                            className="bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-mono px-2 py-1 rounded-full border border-white/20 outline-none cursor-pointer hover:bg-black/70 transition max-w-[140px] sm:max-w-none truncate"
-                            id="song-switcher-select"
-                        >
-                            {allSongs.map((s) => (
-                                <option key={s.id} value={s.id} className="bg-neutral-900 text-white">
-                                    {s.titleSong} ({artists.find(a => a.id === s.artistId)?.name})
-                                </option>
-                            ))}
-                        </select>
                     </div>
 
                     {/* LARGE SONG TITLE (ITALIC DISPLAY) */}
-                    <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tight text-white font-sans drop-shadow-md leading-tight">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black italic tracking-tight text-white drop-shadow-md leading-tight">
                         {song.titleSong}
                     </h1>
 
@@ -126,8 +113,8 @@ export default function SongProfileView({
                                 YT: {(song.youtubeViews / 1000000).toFixed(0)}M
                             </span>
                             <span className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-white/10">
-                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block"></span>
-                                UGC: {song.ugcVideosCount}
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
+                                APPLEM: {(song.appleMusicViews / 1000000).toFixed(0)}M
                             </span>
                         </div>
                     </div>
@@ -167,32 +154,32 @@ export default function SongProfileView({
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1, duration: 0.35 }}
-                    className="relative group rounded-xl p-3.5 border border-amber-500/25 glass-panel-heavy overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:shadow-[0_0_30px_rgba(245,158,11,0.3)] transition duration-300"
+                    className="relative group rounded-xl p-3.5 border border-pink-500/25 glass-panel-heavy overflow-hidden shadow-[0_0_20px_rgba(236,72,153,0.15)] hover:shadow-[0_0_30px_rgba(236,72,153,0.35)] transition duration-300"
                 >
                     {/* Compact Glow aura */}
-                    <div className="absolute -top-8 -left-8 w-24 h-24 bg-amber-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-amber-500/30 transition" />
+                    <div className="absolute -top-8 -left-8 w-24 h-24 bg-pink-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-pink-500/30 transition" />
 
                     <div className="relative z-10 flex flex-col justify-between h-full space-y-2">
                         <div className="flex items-center justify-between gap-1">
-                            <span className="text-[10px] font-mono font-bold text-amber-300 uppercase tracking-wider truncate">
+                            <span className="text-[10px] font-body font-bold text-pink-300 uppercase tracking-wider truncate">
                                 Save Rate
                             </span>
-                            <div className="w-6 h-6 rounded-md bg-amber-500/20 flex items-center justify-center border border-amber-500/40 text-amber-300 flex-shrink-0">
+                            <div className="w-6 h-6 rounded-md bg-pink-500/20 flex items-center justify-center border border-pink-500/40 text-pink-300 flex-shrink-0">
                                 <BookmarkIcon className="w-3 h-3" />
                             </div>
                         </div>
 
                         <div className="flex items-baseline justify-between gap-2 pt-0.5">
-                            <div className="text-2xl font-black text-white tracking-tight font-sans drop-shadow-[0_2px_8px_rgba(245,158,11,0.4)]">
+                            <div className="text-2xl font-black text-white tracking-tight font-heading drop-shadow-[0_2px_8px_rgba(236,72,153,0.4)]">
                                 {song.saveRate}%
                             </div>
-                            <p className="text-[9px] text-amber-200/70 font-mono text-right truncate">
+                            <p className="text-[9px] text-pink-200/70 font-body text-right truncate">
                                 Tasa guardado / repro
                             </p>
                         </div>
 
                         {/* Glowing Accent Underline */}
-                        <div className="w-full h-0.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-transparent rounded-full opacity-80" />
+                        <div className="w-full h-0.5 bg-gradient-to-r from-pink-500 via-orange-400 to-transparent rounded-full opacity-80" />
                     </div>
                 </motion.div>
 
@@ -201,32 +188,32 @@ export default function SongProfileView({
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.15, duration: 0.35 }}
-                    className="relative group rounded-xl p-3.5 border border-purple-500/25 glass-panel-heavy overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition duration-300"
+                    className="relative group rounded-xl p-3.5 border border-orange-500/25 glass-panel-heavy overflow-hidden shadow-[0_0_20px_rgba(249,115,22,0.15)] hover:shadow-[0_0_30px_rgba(249,115,22,0.35)] transition duration-300"
                 >
                     {/* Compact Glow aura */}
-                    <div className="absolute -top-8 -left-8 w-24 h-24 bg-purple-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/30 transition" />
+                    <div className="absolute -top-8 -left-8 w-24 h-24 bg-orange-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-orange-500/30 transition" />
 
                     <div className="relative z-10 flex flex-col justify-between h-full space-y-2">
                         <div className="flex items-center justify-between gap-1">
-                            <span className="text-[10px] font-mono font-bold text-purple-300 uppercase tracking-wider truncate">
+                            <span className="text-[10px] font-body font-bold text-orange-300 uppercase tracking-wider truncate">
                                 UGC (Ingresos / Videos)
                             </span>
-                            <div className="w-6 h-6 rounded-md bg-purple-500/20 flex items-center justify-center border border-purple-500/40 text-purple-300 flex-shrink-0">
+                            <div className="w-6 h-6 rounded-md bg-orange-500/20 flex items-center justify-center border border-orange-500/40 text-orange-300 flex-shrink-0">
                                 <Zap className="w-3 h-3" />
                             </div>
                         </div>
 
                         <div className="flex items-baseline justify-between gap-2 pt-0.5">
-                            <div className="text-2xl font-black text-white tracking-tight font-sans drop-shadow-[0_2px_8px_rgba(168,85,247,0.4)]">
+                            <div className="text-2xl font-black text-white tracking-tight font-heading drop-shadow-[0_2px_8px_rgba(249,115,22,0.4)]">
                                 ${song.ugcRevenue.toFixed(2)}
                             </div>
-                            <p className="text-[9px] text-purple-200/70 font-mono text-right truncate">
+                            <p className="text-[9px] text-orange-200/70 font-body text-right truncate">
                                 {song.ugcVideosCount} videos creados
                             </p>
                         </div>
 
                         {/* Glowing Accent Underline */}
-                        <div className="w-full h-0.5 bg-gradient-to-r from-purple-500 via-fuchsia-400 to-transparent rounded-full opacity-80" />
+                        <div className="w-full h-0.5 bg-gradient-to-r from-orange-500 via-pink-400 to-transparent rounded-full opacity-80" />
                     </div>
                 </motion.div>
 
@@ -251,16 +238,16 @@ export default function SongProfileView({
                         </div>
 
                         <div className="flex items-baseline justify-between gap-2 pt-0.5">
-                            <div className="text-2xl font-black text-white tracking-tight font-sans drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]">
+                            <div className="text-2xl font-black text-white tracking-tight font-heading drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]">
                                 ${song.epmr.toFixed(2)}
                             </div>
-                            <p className="text-[9px] text-cyan-200/70 font-mono text-right truncate">
+                            <p className="text-[9px] text-cyan-200/70 font-body text-right truncate">
                                 Efectiva / 1k repros
                             </p>
                         </div>
 
                         {/* Glowing Accent Underline */}
-                        <div className="w-full h-0.5 bg-gradient-to-r from-cyan-500 via-teal-300 to-transparent rounded-full opacity-80" />
+                        <div className="w-full h-0.5 bg-gradient-to-r from-pink-500 via-orange-400 to-transparent rounded-full opacity-80" />
                     </div>
                 </motion.div>
 
@@ -285,10 +272,10 @@ export default function SongProfileView({
                         </div>
 
                         <div className="flex items-baseline justify-between gap-2 pt-0.5">
-                            <div className="text-2xl font-black text-white tracking-tight font-sans drop-shadow-[0_2px_8px_rgba(236,72,153,0.4)]">
+                            <div className="text-2xl font-black text-white tracking-tight font-heading drop-shadow-[0_2px_8px_rgba(236,72,153,0.4)]">
                                 {song.trackToProfileRate}%
                             </div>
-                            <p className="text-[9px] text-pink-200/70 font-mono text-right truncate">
+                            <p className="text-[9px] text-pink-200/70 font-body text-right truncate">
                                 Conversión Fan Directo
                             </p>
                         </div>
@@ -316,8 +303,8 @@ export default function SongProfileView({
                             </h3>
                             <span className="text-[10px] font-mono text-neutral-400">(k USD)</span>
                         </div>
-                        <p className="text-[11px] text-neutral-400 font-sans leading-tight">
-                            Evolución mensual de ingresos distribuidos por plataforma.
+                        <p className="text-[11px] text-neutral-400 font-body leading-tight">
+                             Evolución mensual de ingresos distribuidos por plataforma.
                         </p>
                     </div>
 
@@ -370,8 +357,8 @@ export default function SongProfileView({
                             </h3>
                             <span className="text-[10px] font-mono text-neutral-400">% Oyentes</span>
                         </div>
-                        <p className="text-[11px] text-neutral-400 font-sans leading-tight">
-                            Retención de audiencia a lo largo del tiempo de reproducción.
+                        <p className="text-[11px] text-neutral-400 font-body leading-tight">
+                             Retención de audiencia a lo largo del tiempo de reproducción.
                         </p>
                     </div>
 
@@ -426,8 +413,8 @@ export default function SongProfileView({
                             </h3>
                             <span className="text-[10px] font-mono text-cyan-400 font-bold">Scorecard</span>
                         </div>
-                        <p className="text-[11px] text-neutral-400 font-sans leading-tight">
-                            Gráfico de Araña con 6 métricas clave de engagement.
+                        <p className="text-[11px] text-neutral-400 font-body leading-tight">
+                             Gráfico de Araña con 6 métricas clave de engagement.
                         </p>
                     </div>
 

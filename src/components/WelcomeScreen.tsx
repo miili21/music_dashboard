@@ -10,8 +10,9 @@ export default function WelcomeScreen({ onExplore }: WelcomeScreenProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden flex flex-col justify-between bg-linear-to-tr from-[#ff9a9e] via-[#fecfef] to-[#a1c4fd]">
-      {/* Wave Background Pattern (Vector lines to replicate the image waves) */}
+    <div className="relative w-full h-screen overflow-hidden flex flex-col justify-between items-center bg-cover bg-center bg-no-repeat"
+    style={{ backgroundImage: "url('/bg1.jpeg')" }}>
+      {/* Wave Background Pattern */}
       <div className="absolute inset-0 opacity-40 pointer-events-none mix-blend-overlay">
         <svg
           className="w-full h-full"
@@ -39,46 +40,64 @@ export default function WelcomeScreen({ onExplore }: WelcomeScreenProps) {
             opacity="0.2"
           />
           <defs>
-            <linearGradient id="wave-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-              <stop offset="50%" stopColor="rgba(255,255,255,0.15)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0.4)" />
-            </linearGradient>
+          <linearGradient id="wave-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+
+  <stop offset="0%" stopColor="#0B0B0E" />
+
+  <stop offset="50%" stopColor="#FF6B00" />
+
+  <stop offset="100%" stopColor="#FF007A" />
+</linearGradient>
           </defs>
         </svg>
       </div>
 
-      {/* Hero Content */}
-      <div className="flex-1 flex flex-col justify-center px-12 md:px-24 select-none relative z-10 pt-20">
+     {/* Hero Content - Centered Horizontally & Vertically */}
+     <div className="flex-1 w-full flex flex-col items-center justify-center text-center px-6 md:px-12 select-none relative z-20 pt-10 pb-36 md:pb-48">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="space-y-0"
+         className="flex flex-col items-center justify-center text-center"
         >
-          <h1 className="text-[12vw] md:text-[8vw] font-extrabold tracking-tight text-white leading-none text-glow font-sans">
-            power
+          <h1
+            style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
+            className="text-[13vw] sm:text-[10vw] md:text-[8vw] lg:text-[7vw] font-black tracking-tight text-white leading-none drop-shadow-md text-center"
+          >
+            power cloud
           </h1>
-          <h1 className="text-[12vw] md:text-[8vw] font-extrabold tracking-tight text-white leading-none text-glow font-sans -mt-4 md:-mt-8">
-            cloud
-          </h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.9 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
+            className="text-white text-base sm:text-lg md:text-xl font-body font-medium tracking-wide max-w-lg mt-4 opacity-90 text-center"
+          >
+            Your lovely music artist dashboard. Enjoy it!
+          </motion.p>
         </motion.div>
         
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          transition={{ delay: 0.6, duration: 1 }}
-          className="text-white text-lg md:text-xl font-medium tracking-wide max-w-md mt-6 font-sans opacity-80"
+        {/* Play Control Badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="mt-6 bg-black/40 backdrop-blur-md px-5 py-2 rounded-full border border-white/20 flex items-center gap-2.5 cursor-pointer text-white text-xs sm:text-sm hover:bg-black/60 transition shadow-lg"
+          onClick={() => setIsPlaying(!isPlaying)}
         >
-          Your lovely music artist dashboard. Have fun!
-        </motion.p>
+          {isPlaying ? <Pause className="w-3.5 h-3.5 fill-white" /> : <Play className="w-3.5 h-3.5 fill-white" />}
+          <span style={{ fontFamily: "Helvetica, Arial, sans-serif" }} className="font-semibold tracking-wider uppercase text-[11px] sm:text-xs">
+            {isPlaying ? "PAUSE PREVIEW" : "PLAY VINYL"}
+          </span>
+        </motion.div>
       </div>
 
-      {/* Vinyl Trio at Bottom */}
-      <div className="relative w-full h-[35vh] md:h-[45vh] flex justify-center items-end select-none">
-        {/* Left Vinyl (smaller, background) */}
+      {/* Vinyl Trio at Bottom - Scaled Up & Cropped at Bottom Overflow */}
+      <div className="absolute bottom-0 left-0 right-0 w-full flex justify-center items-end select-none pointer-events-none z-10 translate-y-[45%] sm:translate-y-[40%] md:translate-y-[38%]">
+        <div className="relative w-full max-w-6xl flex justify-center items-end pointer-events-auto h-[350px] sm:h-[450px] md:h-[550px] lg:h-[620px]">
+          {/* Left Vinyl */}
         <motion.div
-          initial={{ opacity: 0, x: -100, rotate: -45 }}
+           initial={{ opacity: 0, x: -120, rotate: -45 }}
           animate={{ opacity: 1, x: 0, rotate: isPlaying ? 315 : -15 }}
           transition={{
             opacity: { duration: 1, delay: 0.3 },
@@ -87,32 +106,32 @@ export default function WelcomeScreen({ onExplore }: WelcomeScreenProps) {
               ? { repeat: Infinity, duration: 15, ease: "linear" } 
               : { duration: 1 }
           }}
-          whileHover={{ y: -20, scale: 1.05, transition: { duration: 0.3 } }}
-          className="absolute left-[5%] sm:left-[20%] md:left-[25%] bottom-[-5%] w-[45vw] h-[45vw] max-w-[280px] max-h-[280px] rounded-full shadow-2xl z-10 cursor-pointer"
+      whileHover={{ y: -15, scale: 1.03, transition: { duration: 0.3 } }}
+            className="absolute left-1/2 -translate-x-[110%] sm:-translate-x-[100%] md:-translate-x-[95%] w-[60vw] sm:w-[48vw] md:w-[40vw] lg:w-[36vw] max-w-[500px] aspect-square rounded-full shadow-2xl z-10 cursor-pointer"
           style={{
             background: `conic-gradient(from 0deg, #0d0d0d 0deg, #262626 40deg, #0d0d0d 80deg, #333333 120deg, #0d0d0d 160deg, #262626 200deg, #0d0d0d 240deg, #333333 280deg, #0d0d0d 320deg, #262626 360deg)`,
-            border: "4px solid #111"
+          border: "5px solid #111"
           }}
           onClick={() => setIsPlaying(!isPlaying)}
         >
           {/* Vinyl Grooves */}
-          <div className="absolute inset-4 rounded-full border border-neutral-800 opacity-60"></div>
-          <div className="absolute inset-8 rounded-full border border-neutral-800 opacity-60"></div>
+          <div className="absolute inset-6 rounded-full border border-neutral-800 opacity-60"></div>
           <div className="absolute inset-12 rounded-full border border-neutral-800 opacity-60"></div>
-          <div className="absolute inset-16 rounded-full border border-neutral-800 opacity-60"></div>
+            <div className="absolute inset-20 rounded-full border border-neutral-800 opacity-60"></div>
+            <div className="absolute inset-28 rounded-full border border-neutral-800 opacity-60"></div>
           {/* Record Label */}
           <div className="absolute inset-[33%] rounded-full bg-[#fce3e4] border-2 border-[#111] flex flex-col items-center justify-center p-1 text-center shadow-inner">
-            <span className="text-[8px] font-mono font-bold text-neutral-800 uppercase tracking-widest scale-75">Side A</span>
-            <span className="text-[9px] font-bold text-neutral-950 font-sans leading-none scale-90 mt-1">POWER</span>
+          <span className="text-[9px] sm:text-[10px] font-mono font-bold text-neutral-800 uppercase tracking-widest">Side A</span>
+          <span style={{ fontFamily: "Helvetica, Arial, sans-serif" }} className="text-[10px] sm:text-[12px] font-bold text-neutral-950 leading-none mt-1">POWER CLOUD</span>
           </div>
           <div className="absolute inset-[46%] rounded-full bg-[#ebd4fc] border border-neutral-800 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-neutral-900"></div>
           </div>
         </motion.div>
 
-        {/* Right Vinyl (smaller, background) */}
+          {/* Right Vinyl */}
         <motion.div
-          initial={{ opacity: 0, x: 100, rotate: 45 }}
+          initial={{ opacity: 0, x: 120, rotate: 45 }}
           animate={{ opacity: 1, x: 0, rotate: isPlaying ? 375 : 15 }}
           transition={{
             opacity: { duration: 1, delay: 0.3 },
@@ -121,32 +140,33 @@ export default function WelcomeScreen({ onExplore }: WelcomeScreenProps) {
               ? { repeat: Infinity, duration: 18, ease: "linear" } 
               : { duration: 1 }
           }}
-          whileHover={{ y: -20, scale: 1.05, transition: { duration: 0.3 } }}
-          className="absolute right-[5%] sm:right-[20%] md:right-[25%] bottom-[-5%] w-[45vw] h-[45vw] max-w-[280px] max-h-[280px] rounded-full shadow-2xl z-10 cursor-pointer"
+         whileHover={{ y: -15, scale: 1.03, transition: { duration: 0.3 } }}
+            className="absolute left-1/2 translate-x-[10%] sm:translate-x-[0%] md:translate-x-[-5%] w-[60vw] sm:w-[48vw] md:w-[40vw] lg:w-[36vw] max-w-[500px] aspect-square rounded-full shadow-2xl z-10 cursor-pointer"
           style={{
             background: `conic-gradient(from 0deg, #0d0d0d 0deg, #262626 45deg, #0d0d0d 90deg, #333333 135deg, #0d0d0d 180deg, #262626 225deg, #0d0d0d 270deg, #333333 315deg, #0d0d0d 360deg)`,
-            border: "4px solid #111"
+              border: "5px solid #111"
           }}
           onClick={() => setIsPlaying(!isPlaying)}
         >
           {/* Vinyl Grooves */}
-          <div className="absolute inset-4 rounded-full border border-neutral-800 opacity-60"></div>
-          <div className="absolute inset-8 rounded-full border border-neutral-800 opacity-60"></div>
+          <div className="absolute inset-6 rounded-full border border-neutral-800 opacity-60"></div>
+
           <div className="absolute inset-12 rounded-full border border-neutral-800 opacity-60"></div>
-          <div className="absolute inset-16 rounded-full border border-neutral-800 opacity-60"></div>
+            <div className="absolute inset-20 rounded-full border border-neutral-800 opacity-60"></div>
+            <div className="absolute inset-28 rounded-full border border-neutral-800 opacity-60"></div>
           {/* Record Label */}
           <div className="absolute inset-[33%] rounded-full bg-[#ebd4fc] border-2 border-[#111] flex flex-col items-center justify-center p-1 text-center shadow-inner">
-            <span className="text-[8px] font-mono font-bold text-neutral-800 uppercase tracking-widest scale-75">Side B</span>
-            <span className="text-[9px] font-bold text-neutral-950 font-sans leading-none scale-90 mt-1">CLOUD</span>
+          <span className="text-[9px] sm:text-[10px] font-mono font-bold text-neutral-800 uppercase tracking-widest">Side B</span>
+          <span style={{ fontFamily: "Helvetica, Arial, sans-serif" }} className="text-[10px] sm:text-[12px] font-bold text-neutral-950 leading-none mt-1">CLOUD</span>
           </div>
           <div className="absolute inset-[46%] rounded-full bg-[#fce3e4] border border-neutral-800 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-neutral-900"></div>
+          <div className="w-3 h-3 rounded-full bg-neutral-900"></div>
           </div>
         </motion.div>
 
-        {/* Center Vinyl (Larger, Foreground, partially covering the two on the sides) */}
+          {/* Center Vinyl (Dominant size, Foreground) */}
         <motion.div
-          initial={{ opacity: 0, y: 150 }}
+         initial={{ opacity: 0, y: 180 }}
           animate={{ opacity: 1, y: 0, rotate: isPlaying ? 360 : 0 }}
           transition={{
             opacity: { duration: 1 },
@@ -155,28 +175,28 @@ export default function WelcomeScreen({ onExplore }: WelcomeScreenProps) {
               ? { repeat: Infinity, duration: 12, ease: "linear" } 
               : { duration: 1 }
           }}
-          whileHover={{ y: -10, scale: 1.03, transition: { duration: 0.3 } }}
-          className="absolute bottom-[-10%] w-[55vw] h-[55vw] max-w-[340px] max-h-[340px] rounded-full shadow-2xl z-20 cursor-pointer border-[5px] border-[#0c0c0c] flex items-center justify-center"
+          whileHover={{ y: -10, scale: 1.02, transition: { duration: 0.3 } }}
+            className="absolute left-1/2 -translate-x-1/2 w-[72vw] sm:w-[58vw] md:w-[48vw] lg:w-[44vw] max-w-[620px] aspect-square rounded-full shadow-2xl z-20 cursor-pointer border-[6px] border-[#0c0c0c] flex items-center justify-center"
           style={{
             background: `conic-gradient(from 0deg, #080808 0deg, #222222 30deg, #080808 60deg, #2e2e2e 90deg, #080808 120deg, #222222 150deg, #080808 180deg, #2e2e2e 210deg, #080808 240deg, #222222 270deg, #080808 300deg, #2e2e2e 330deg, #080808 360deg)`
           }}
           onClick={() => setIsPlaying(!isPlaying)}
         >
           {/* Vinyl Grooves */}
-          <div className="absolute inset-4 rounded-full border border-neutral-800 opacity-70"></div>
-          <div className="absolute inset-8 rounded-full border border-neutral-800 opacity-70"></div>
+          <div className="absolute inset-6 rounded-full border border-neutral-800 opacity-70"></div>
+
           <div className="absolute inset-12 rounded-full border border-neutral-800 opacity-70"></div>
-          <div className="absolute inset-16 rounded-full border border-neutral-800 opacity-70"></div>
-          <div className="absolute inset-20 rounded-full border border-neutral-800 opacity-70"></div>
-          <div className="absolute inset-24 rounded-full border border-neutral-800 opacity-70"></div>
+            <div className="absolute inset-20 rounded-full border border-neutral-800 opacity-70"></div>
+            <div className="absolute inset-28 rounded-full border border-neutral-800 opacity-70"></div>
+            <div className="absolute inset-36 rounded-full border border-neutral-800 opacity-70"></div>
           {/* Record Label */}
-          <div className="absolute inset-[33%] rounded-full bg-white border-2 border-[#111] flex flex-col items-center justify-center p-2 text-center shadow-inner">
-            <span className="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest scale-75">CLOUD</span>
-            <span className="text-[12px] font-black text-neutral-900 font-sans tracking-tight mt-1 leading-none">MUSIC</span>
-            <span className="text-[8px] text-neutral-500 font-semibold tracking-wide">DASHBOARD</span>
+          <div className="absolute inset-[32%] rounded-full bg-white border-2 border-[#111] flex flex-col items-center justify-center p-2 text-center shadow-inner">
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold text-neutral-500 uppercase tracking-widest">POWER CLOUD</span>
+              <span style={{ fontFamily: "Helvetica, Arial, sans-serif" }} className="text-[13px] sm:text-[16px] font-black text-neutral-900 tracking-tight mt-1 leading-none">ARTIST</span>
+              <span style={{ fontFamily: "Helvetica, Arial, sans-serif" }} className="text-[9px] sm:text-[10px] text-neutral-500 font-bold tracking-wide">DASHBOARD</span>
           </div>
           <div className="absolute inset-[46%] rounded-full bg-[#ff9a9e] border border-neutral-800 flex items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-full bg-neutral-900"></div>
+          <div className="w-3.5 h-3.5 rounded-full bg-neutral-900"></div>
           </div>
         </motion.div>
 
@@ -189,25 +209,26 @@ export default function WelcomeScreen({ onExplore }: WelcomeScreenProps) {
         </div>
       </div>
 
-      {/* Footer / Scroll hint */}
-      <div className="pb-8 flex flex-col items-center justify-center z-10">
+     {/* Floating Scroll Down Arrow Hint at Bottom Center */}
+     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
         <motion.button
           onClick={onExplore}
-          className="flex flex-col items-center gap-2 group cursor-pointer focus:outline-none"
-          whileHover={{ y: 5 }}
+          className="flex flex-col items-center gap-1 group cursor-pointer focus:outline-none"
+          whileHover={{ y: 3 }}
           transition={{ duration: 0.2 }}
         >
           <span className="text-white text-sm font-semibold uppercase tracking-widest group-hover:opacity-100 opacity-80 transition duration-300">
             Scroll to Dashboard
           </span>
           <motion.div
-            animate={{ y: [0, 5, 0] }}
+            animate={{ y: [0, 4, 0] }}
             transition={{ repeat: Infinity, duration: 1.5 }}
           >
-            <ChevronDown className="w-6 h-6 text-white" />
+            <ChevronDown className="w-5 h-5 text-white drop-shadow" />
           </motion.div>
         </motion.button>
       </div>
-    </div>
+      </div>
+      </div>
   );
 }

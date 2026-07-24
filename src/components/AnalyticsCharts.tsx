@@ -15,7 +15,7 @@ import { albums } from "../data/albums";
 import { artists } from "../data/artists";
 
 interface AnalyticsChartsProps {
-  selectedArtistId: number;
+  selectedArtistId: number | null;
 }
 
 export default function AnalyticsCharts({ selectedArtistId }: AnalyticsChartsProps) {

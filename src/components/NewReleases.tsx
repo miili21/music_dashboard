@@ -6,7 +6,7 @@ import { albums } from "../data/albums";
 
 interface NewReleasesProps {
   onSelectArtist: (id: number) => void;
-  selectedArtistId: number;
+  selectedArtistId: number | null;
 }
 
 export default function NewReleases({ onSelectArtist, selectedArtistId }: NewReleasesProps) {

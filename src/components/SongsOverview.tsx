@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Song, songs } from "../data/songs";
 import { Album, albums } from "../data/albums";
 import { Artist, artists } from "../data/artists";
-import { Music, Play, ChevronRight, Filter, Sparkles, TrendingUp, Eye, Bookmark, Zap, Disc } from "lucide-react";
+import { Music, Play, ChevronRight, Filter, Sparkles, Disc } from "lucide-react";
 
 interface SongsOverviewProps {
     onSelectSong: (songId: number) => void;
@@ -21,7 +21,7 @@ export default function SongsOverview({
     // State filters
     const [selectedArtistFilter, setSelectedArtistFilter] = useState<number | "all">(currentArtistId || "all");
     const [selectedAlbumFilter, setSelectedAlbumFilter] = useState<number | "all">("all");
-    const [sortBy, setSortBy] = useState<"views" | "saveRate" | "ugc" | "epmr">("views");
+    const [sortBy, setSortBy] = useState<"views_desc" | "views_asc">("views_desc");
 
     // Translations
     const t = {
@@ -33,15 +33,10 @@ export default function SongsOverview({
             sortBy: "Ordenar por:",
             allArtists: "Todos los Artistas",
             allAlbums: "Todos los Álbumes",
-            views: "Más Vistas",
-            saveRate: "Mayor Save Rate",
-            ugc: "Mayor UGC",
-            epmr: "Mayor ePMR",
+            viewsDesc: "Más Vistas",
+            viewsAsc: "Menos Vistas",
             tracksInAlbum: "canciones en este álbum",
             viewProfile: "Ver Perfil de Canción",
-            saveRateLabel: "Save Rate",
-            ugcLabel: "Videos UGC",
-            epmrLabel: "ePMR",
             totalViewsLabel: "Vistas Totales",
         },
         en: {
@@ -52,15 +47,10 @@ export default function SongsOverview({
             sortBy: "Sort by:",
             allArtists: "All Artists",
             allAlbums: "All Albums",
-            views: "Most Views",
-            saveRate: "Highest Save Rate",
-            ugc: "Highest UGC",
-            epmr: "Highest ePMR",
+            viewsDesc: "Most Views",
+            viewsAsc: "Least Views",
             tracksInAlbum: "tracks in this album",
             viewProfile: "View Song Profile",
-            saveRateLabel: "Save Rate",
-            ugcLabel: "UGC Videos",
-            epmrLabel: "ePMR",
             totalViewsLabel: "Total Views",
         },
     }[language];
@@ -80,11 +70,8 @@ export default function SongsOverview({
     // Sort songs helper
     const sortSongsList = (list: Song[]) => {
         return [...list].sort((a, b) => {
-            if (sortBy === "views") return b.totalViews - a.totalViews;
-            if (sortBy === "saveRate") return b.saveRate - a.saveRate;
-            if (sortBy === "ugc") return b.ugcRevenue - a.ugcRevenue;
-            if (sortBy === "epmr") return b.epmr - a.epmr;
-            return 0;
+            if (sortBy === "views_asc") return a.totalViews - b.totalViews;
+            return b.totalViews - a.totalViews;
         });
     };
 
@@ -102,11 +89,11 @@ export default function SongsOverview({
                             <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
                                 <Music className="w-4 h-4 text-pink-500" />
                             </div>
-                            <h1 className="text-xl sm:text-2xl font-black text-white uppercase font-mono tracking-wide">
+                            <h1 className="text-xl sm:text-2xl font-heading font-black text-white uppercase tracking-wide">
                                 {t.title}
                             </h1>
                         </div>
-                        <p className="text-xs text-neutral-400 max-w-xl font-sans">
+                        <p className="text-xs text-neutral-400 max-w-xl font-body">
                             {t.subtitle}
                         </p>
                     </div>
@@ -165,13 +152,12 @@ export default function SongsOverview({
                         <span className="text-neutral-500">{t.sortBy}</span>
                         <select
                             value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value as any)}
+                            onChange={(e) => setSortBy(e.target.value as "views_desc" | "views_asc")}
                             className="bg-transparent text-pink-400 font-bold outline-none cursor-pointer"
                         >
-                            <option value="views" className="bg-neutral-900 text-white">{t.views}</option>
-                            <option value="saveRate" className="bg-neutral-900 text-white">{t.saveRate}</option>
-                            <option value="ugc" className="bg-neutral-900 text-white">{t.ugc}</option>
-                            <option value="epmr" className="bg-neutral-900 text-white">{t.epmr}</option>
+                          <option value="views_desc" className="bg-neutral-900 text-white">{t.viewsDesc}</option>
+                          <option value="views_asc" className="bg-neutral-900 text-white">{t.viewsAsc}</option>
+
                         </select>
                     </div>
 
@@ -208,7 +194,7 @@ export default function SongsOverview({
                                             </span>
                                             <span className="text-[10px] text-neutral-500 font-mono">&bull; {album.year}</span>
                                         </div>
-                                        <h2 className="text-lg font-bold text-white tracking-tight font-sans">
+                                        <h2 className="text-lg font-heading font-bold text-white tracking-tight">
                                             {album.titleAlbum}
                                         </h2>
                                     </div>
@@ -240,7 +226,7 @@ export default function SongsOverview({
                                         />
 
                                         {/* TOP HALF: Song Info & Artwork */}
-                                        <div className="flex items-start gap-3.5 relative z-10">
+                                        <div className="flex items-start gap-3.5 relative z-10 mb-3">
                                             <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-white/15 flex-shrink-0 group-hover:border-white/40 transition">
                                                 <img src={song.coverUrl} alt={song.titleSong} className="w-full h-full object-cover" />
                                                 {/* Play button overlay */}
@@ -259,7 +245,7 @@ export default function SongsOverview({
 
                                             <div className="flex-1 min-w-0 space-y-1">
                                                 <div className="flex items-center justify-between gap-2">
-                                                    <h3 className="text-base font-bold text-white truncate group-hover:text-pink-300 transition font-sans">
+                                                    <h3 className="text-base font-subtitle font-bold text-white truncate group-hover:text-pink-300 transition">
                                                         {song.titleSong}
                                                     </h3>
                                                     <span className="text-[10px] font-mono font-bold text-neutral-400 bg-black/40 px-2 py-0.5 rounded border border-white/10 flex-shrink-0">
@@ -268,34 +254,11 @@ export default function SongsOverview({
                                                 </div>
 
                                                 <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-                                                    <span className="text-neutral-300">{(song.totalViews / 1000000).toFixed(0)}M views</span>
+                                                <span className="text-neutral-300 font-bold">{(song.totalViews / 1000000).toFixed(0)}M vistas</span>
                                                     <span>&bull;</span>
                                                     <span className="text-emerald-400 font-bold">${(song.kpis.earnings / 1000000).toFixed(1)}M</span>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        {/* MIDDLE: 3 MINI KPIS PILLS */}
-                                        <div className="grid grid-cols-3 gap-2 my-3 pt-3 border-t border-white/10 relative z-10 font-mono text-[10px]">
-
-                                            {/* Save Rate */}
-                                            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2 text-center">
-                                                <span className="text-amber-400/80 block text-[9px] uppercase font-bold">{t.saveRateLabel}</span>
-                                                <span className="text-xs font-extrabold text-amber-300">{song.saveRate}%</span>
-                                            </div>
-
-                                            {/* UGC Videos */}
-                                            <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-2 text-center">
-                                                <span className="text-purple-400/80 block text-[9px] uppercase font-bold">{t.ugcLabel}</span>
-                                                <span className="text-xs font-extrabold text-purple-300">{song.ugcVideosCount}</span>
-                                            </div>
-
-                                            {/* ePMR */}
-                                            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-2 text-center">
-                                                <span className="text-cyan-400/80 block text-[9px] uppercase font-bold">{t.epmrLabel}</span>
-                                                <span className="text-xs font-extrabold text-cyan-300">${song.epmr.toFixed(2)}</span>
-                                            </div>
-
                                         </div>
 
                                         {/* BOTTOM: ACTION BUTTON */}

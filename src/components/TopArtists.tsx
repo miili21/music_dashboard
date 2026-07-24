@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Artist, artists } from "../data/artists";
 
 interface TopArtistsProps {
-  selectedArtistId: number;
+  selectedArtistId: number | null;
   onSelectArtist: (id: number) => void;
 }
 

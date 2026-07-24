@@ -144,7 +144,7 @@ export default function AlbumProfileView({ album, language, onSongSelect }: Albu
 
         {/* Header containing lowercased light italic Inter title & Artist name */}
         <div className="space-y-1">
-          <span className="text-[10px] tracking-widest font-mono uppercase text-purple-400 bg-purple-500/5 px-2.5 py-1 rounded border border-purple-500/15 mb-2 inline-block">
+          <span className="text-[10px] tracking-widest font-mono uppercase text-pink-400 bg-pink-500/5 px-2.5 py-1 rounded border border-pink-500/15 mb-2 inline-block">
             {artist.name} &bull; {album.year}
           </span>
           {/* Title in lowercase, light italic display as shown in mockup */}
@@ -152,7 +152,7 @@ export default function AlbumProfileView({ album, language, onSongSelect }: Albu
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-sans font-light italic text-white tracking-tight leading-none lowercase"
+            className="text-5xl md:text-6xl lg:text-7xl font-heading font-light italic text-white tracking-tight leading-none lowercase"
           >
             {album.titleAlbum}
           </motion.h1>
@@ -161,31 +161,31 @@ export default function AlbumProfileView({ album, language, onSongSelect }: Albu
         {/* 3 KPIs exactly styled like the ones in the prompt mockup (dark rounded cards, white values) */}
         <div className="grid grid-cols-3 gap-3">
           {/* KPI 1: ROI */}
-          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 text-center shadow-lg hover:border-blue-500/50 transition duration-300">
-            <span className="text-[10px] font-mono text-neutral-400 block mb-1 uppercase tracking-wider">
+          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 text-center shadow-lg hover:border-pink-500/50 hover:shadow-[0_0_18px_rgba(236,72,153,0.2)] transition duration-300">
+            <span className="text-[10px] font-body text-neutral-400 block mb-1 uppercase tracking-wider">
               {t.roiLabel}
             </span>
-            <span className="text-sm md:text-base font-black text-white font-mono tracking-wide">
+            <span className="text-sm md:text-base font-black font-mono tracking-wide text-neon-gradient">
               {album.roi}%
             </span>
           </div>
 
           {/* KPI 2: Break-Point */}
-          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 text-center shadow-lg hover:border-amber-500/50 transition duration-300">
-            <span className="text-[10px] font-mono text-neutral-400 block mb-1 uppercase tracking-wider">
+          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 text-center shadow-lg hover:border-orange-500/50 hover:shadow-[0_0_18px_rgba(249,115,22,0.2)] transition duration-300">
+            <span className="text-[10px] font-body text-neutral-400 block mb-1 uppercase tracking-wider">
               {t.breakPointLabel}
             </span>
-            <span className="text-sm md:text-base font-black text-white font-mono tracking-wide truncate block">
+            <span className="text-sm md:text-base font-black font-mono tracking-wide truncate block text-neon-gradient">
               {album.breakEven.toLocaleString()}$
             </span>
           </div>
 
           {/* KPI 3: Album Completion Rate */}
-          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 text-center shadow-lg hover:border-emerald-500/50 transition duration-300">
-            <span className="text-[9px] md:text-[10px] font-mono text-neutral-400 block mb-1 uppercase tracking-wider leading-tight">
+          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 text-center shadow-lg hover:border-pink-500/50 hover:shadow-[0_0_18px_rgba(236,72,153,0.15)] transition duration-300">
+            <span className="text-[9px] md:text-[10px] font-body text-neutral-400 block mb-1 uppercase tracking-wider leading-tight">
               Completion Rate
             </span>
-            <span className="text-sm md:text-base font-black text-white font-mono tracking-wide">
+            <span className="text-sm md:text-base font-black font-mono tracking-wide text-neon-gradient">
               {album.completionRate}%
             </span>
           </div>
@@ -213,10 +213,10 @@ export default function AlbumProfileView({ album, language, onSongSelect }: Albu
                 {/* Title and descriptions */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <h2 className="text-3xl font-extrabold italic text-white leading-tight font-sans tracking-wide">
+                    <h2 className="text-3xl font-heading font-extrabold italic text-white leading-tight tracking-wide">
                       {leadSong.titleSong}
                     </h2>
-                    <p className="text-[11px] text-neutral-400 max-w-[200px] font-sans leading-relaxed">
+                    <p className="text-[11px] text-neutral-400 max-w-[200px] font-body leading-relaxed">
                       Top active single with massive dynamic streams.
                     </p>
                   </div>

@@ -3,7 +3,7 @@ import { artists } from "../data/artists";
 import { albums } from "../data/albums";
 
 interface TopCloudAlbumsProps {
-  selectedId: number;
+  selectedId: number | null;
   onSelect: (id: number) => void;
 }
 

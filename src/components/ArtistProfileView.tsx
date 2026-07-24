@@ -17,9 +17,16 @@ import { Heart } from "lucide-react";
 interface ArtistProfileViewProps {
   artist: Artist;
   onSongSelect?: (songId: number) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: (artistId: number) => void;
 }
 
-export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfileViewProps) {
+export default function ArtistProfileView({
+  artist,
+  onSongSelect,
+  isFavorite,
+  onToggleFavorite,
+}: ArtistProfileViewProps) {
   // -------------------------------------------------------------------------
   // 1. EARNINGS OVER THE LAST 3 YEARS (Categories: merch, shows, albums, streaming)
   // -------------------------------------------------------------------------
@@ -94,10 +101,25 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
           transition={{ duration: 0.6 }}
           className="max-w-2xl select-none"
         >
-          <span className="text-[10px] tracking-widest font-mono uppercase text-pink-500/80 bg-pink-500/5 px-2.5 py-1 rounded border border-pink-500/15 mb-2 inline-block">
+           <div className="flex flex-wrap items-center gap-3 mb-2">
+           <span className="text-[10px] tracking-widest font-mono uppercase text-pink-500/80 bg-pink-500/5 px-2.5 py-1 rounded border border-pink-500/15 inline-block">
             Artist Spotlight
           </span>
-          <h1 className="text-5xl md:text-7xl font-sans font-light italic text-white tracking-tight leading-none text-glow uppercase sm:normal-case">
+          {onToggleFavorite && (
+              <button
+                onClick={() => onToggleFavorite(artist.id)}
+                className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-full border transition duration-300 ${
+                  isFavorite
+                    ? "bg-pink-500/20 border-pink-500/60 text-pink-300 hover:bg-pink-500/30"
+                    : "bg-white/5 border-white/15 text-neutral-300 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500/30"
+                }`}
+              >
+                <Heart className={`w-3.5 h-3.5 ${isFavorite ? "fill-pink-500 text-pink-500" : ""}`} />
+                <span>{isFavorite ? "Favorito" : "Añadir a Favoritos"}</span>
+              </button>
+            )}
+          </div>
+          <h1 className="text-5xl md:text-7xl font-heading font-black italic text-white tracking-tight leading-none text-glow uppercase sm:normal-case">
             {artist.name}
           </h1>
         </motion.div>
@@ -110,25 +132,25 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
           className="flex flex-wrap items-center gap-3 xl:justify-end"
         >
           {/* Conversion rate */}
-          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 min-w-[120px] text-center shadow-lg hover:border-pink-500/50 transition duration-300">
-            <span className="text-[10px] font-mono text-neutral-400 block mb-1">Conversión Oyentes</span>
-            <span className="text-base font-black text-white font-mono tracking-wide">
+          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 min-w-[120px] text-center shadow-lg hover:border-pink-500/50 hover:shadow-[0_0_18px_rgba(236,72,153,0.25)] transition duration-300">
+            <span className="text-[10px] font-body text-neutral-400 block mb-1">Conversión Oyentes</span>
+            <span className="text-base font-black font-mono tracking-wide text-neon-gradient">
               {artist.kpis.conversionRate}%
             </span>
           </div>
 
           {/* Subscription Monthly Earning */}
-          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 min-w-[140px] text-center shadow-lg hover:border-purple-500/50 transition duration-300">
-            <span className="text-[10px] font-mono text-neutral-400 block mb-1">Ingresos suscripciones</span>
-            <span className="text-base font-black text-white font-mono tracking-wide">
+          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 min-w-[140px] text-center shadow-lg hover:border-orange-500/50 hover:shadow-[0_0_18px_rgba(249,115,22,0.2)] transition duration-300">
+            <span className="text-[10px] font-body text-neutral-400 block mb-1">Ingresos suscripciones</span>
+            <span className="text-base font-black font-mono tracking-wide text-neon-gradient">
               {formatValue(artist.kpis.subscriptionEarning)}
             </span>
           </div>
 
           {/* Last Album net benefits */}
-          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 min-w-[130px] text-center shadow-lg hover:border-orange-500/50 transition duration-300">
-            <span className="text-[10px] font-mono text-neutral-400 block mb-1">Beneficio Neto</span>
-            <span className="text-base font-black text-white font-mono tracking-wide">
+          <div className="rounded-2xl border border-white/20 bg-neutral-950/60 p-4 min-w-[130px] text-center shadow-lg hover:border-pink-500/50 hover:shadow-[0_0_18px_rgba(236,72,153,0.2)] transition duration-300">
+            <span className="text-[10px] font-body text-neutral-400 block mb-1">Beneficio Neto</span>
+            <span className="text-base font-black font-mono tracking-wide text-neon-gradient">
               {formatValue(artist.kpis.netBenefits)}
             </span>
           </div>
@@ -156,10 +178,10 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
             {/* Title / Cover info */}
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
-                <h2 className="text-3xl md:text-4xl font-extrabold italic text-white leading-tight font-sans tracking-wide">
+                <h2 className="text-3xl md:text-4xl font-heading font-extrabold italic text-white leading-tight tracking-wide">
                   {artist.bannerSong.titleSong}
                 </h2>
-                <p className="text-xs text-neutral-400 max-w-xs font-sans leading-relaxed">
+                <p className="text-xs text-neutral-400 max-w-xs font-body leading-relaxed">
                   {artist.bannerSong.description}
                 </p>
               </div>
@@ -218,7 +240,7 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
                 Category Split
               </span>
             </div>
-            <p className="text-[11px] text-neutral-400 mb-4 leading-relaxed font-sans">
+            <p className="text-[11px] text-neutral-400 mb-4 leading-relaxed font-body">
               Performance breakdown of shows, merch, physical albums, and digital streaming (in Millions USD).
             </p>
           </div>
@@ -299,7 +321,7 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
                 Streaming + Downloads
               </span>
             </div>
-            <p className="text-[10px] text-neutral-500 font-mono mb-4">
+            <p className="text-[10px] text-neutral-500 font-body mb-4">
               Real-time calculations based on multi-platform monetization.
             </p>
           </div>
@@ -331,7 +353,7 @@ export default function ArtistProfileView({ artist, onSongSelect }: ArtistProfil
                   <div className="flex items-center gap-4">
                     <div className="w-16 sm:w-24 bg-neutral-900 h-1.5 rounded-full overflow-hidden relative">
                       <div
-                        className="h-full bg-linear-to-r from-purple-500 to-pink-500 rounded-full"
+                        className="h-full bg-gradient-to-r from-pink-500 to-orange-500 rounded-full"
                         style={{ width: `${track.popularity}%` }}
                       ></div>
                     </div>

@@ -23,7 +23,7 @@ export type ViewMode = "dashboard" | "artist" | "songs" | "song_detail" | "album
 interface TopNavBarProps {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  currentArtist: Artist;
+  currentArtist: Artist | null;
   currentAlbum?: Album;
   currentSong?: Song;
   searchQuery: string;
@@ -123,7 +123,7 @@ export default function TopNavBar({
             <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-pink-500 to-orange-500 flex items-center justify-center shadow-lg group-hover:scale-105 transition duration-300">
               <span className="text-white text-[10px] font-black tracking-tighter">PC</span>
             </div>
-            <span className="text-white text-xs font-extrabold tracking-widest font-mono hidden sm:inline-block">
+            <span className="text-white text-xs font-heading font-extrabold tracking-widest hidden sm:inline-block">
               POWER
             </span>
           </button>
@@ -148,7 +148,7 @@ export default function TopNavBar({
 
                 {viewMode === "artist" && (
                   <span className="text-pink-400 font-bold uppercase truncate max-w-[120px]">
-                    {currentArtist.name}
+                   {currentArtist?.name || t.artist}
                   </span>
                 )}
 
@@ -332,7 +332,7 @@ export default function TopNavBar({
                           >
                             <div className="flex items-center gap-2 truncate">
                               <img src={artist.avatarUrl} className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
-                              <span className="text-white text-xs truncate font-sans font-medium">{artist.name}</span>
+                               <span className="text-white text-xs truncate font-subtitle font-medium">{artist.name}</span>
                             </div>
                             <button
                               onClick={(e) => {

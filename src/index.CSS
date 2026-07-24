@@ -1,8 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-heading: "Helvetica Neue", "Helvetica", "Arial", ui-sans-serif, sans-serif;
+  --font-subtitle: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
 @layer utilities {
+  /* ---- Typography roles ---- */
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+  .font-subtitle {
+    font-family: var(--font-subtitle);
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  /* ---- Gradient text utility ---- */
+  .text-neon-gradient {
+    background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
   /* Glassmorphism */
   .glass-panel {
     background: rgba(255, 255, 255, 0.04);
@@ -68,7 +93,7 @@
 
 /* Base custom styles */
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   background-color: #000;
   color: #fff;
   overflow-x: hidden;
